@@ -1,34 +1,33 @@
-version: "3.9"
-
 services:
-  api:
-    build: .
-    ports:
-      - "8000:8000"
-    volumes:
-      - ./app:/app
-    env_file:
-      - .env
-    depends_on:
-      - postgres
-      - redis
-    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
-
   postgres:
     image: postgres:15
     environment:
-      POSTGRES_USER: bridge
-      POSTGRES_PASSWORD: bridge123
+      POSTGRES_USER: bridgebulks
+      POSTGRES_PASSWORD: bridgebulks
       POSTGRES_DB: bridgebulks
-    ports:
-      - "5432:5432"
     volumes:
       - pg_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
 
   redis:
     image: redis:7
     ports:
       - "6379:6379"
+
+  api:
+    build: .
+    command: >
+      sh -c "sleep 5 && uvicorn main:app --host 0.0.0.0 --port 8000"
+    volumes:
+      - ./app:/app
+    ports:
+      - "8000:8000"
+    environment:              # ✅ MUST be key-value
+      DATABASE_URL: postgresql://bridgebulks:bridgebulks@postgres:5432/bridgebulks
+    depends_on:
+      - postgres
+      - redis
 
 volumes:
   pg_data:
