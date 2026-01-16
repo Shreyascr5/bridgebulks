@@ -1,12 +1,9 @@
 from fastapi import FastAPI
-from db import engine
-from models import Base
+from db import Base, engine
+from api.routes import router
 
 app = FastAPI()
 
 Base.metadata.create_all(bind=engine)
 
-
-@app.get("/")
-def health():
-    return {"status": "FastAPI is running cleanly 🚀"}
+app.include_router(router)
