@@ -1,12 +1,12 @@
 from fastapi import FastAPI
-from db import engine, Base
-from api.routes import router
+from db import engine
+from models import Base
 
-app = FastAPI(title="Bridge Bulking Platform")
+app = FastAPI()
 
-# Base.metadata.create_all(bind=engine)
-app.include_router(router)
+Base.metadata.create_all(bind=engine)
+
 
 @app.get("/")
-def root():
-    return {"status": "FastAPI + DB ready 🚀"}
+def health():
+    return {"status": "FastAPI is running cleanly 🚀"}
