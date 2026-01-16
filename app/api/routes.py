@@ -19,3 +19,8 @@ def create_vendor(
     db.commit()
     db.refresh(new_vendor)
     return new_vendor
+@router.get("/vendors")
+def list_vendors(db: Session = Depends(get_db)):
+    vendors = db.query(Vendor).all()
+    return vendors
+
