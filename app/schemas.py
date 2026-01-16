@@ -1,28 +1,23 @@
 from pydantic import BaseModel
+from typing import List, Optional
 
 
-# ---------- User ----------
-class UserCreate(BaseModel):
-    email: str
-    password: str
-
-
-# ---------- Vendor ----------
+# -------- Vendor --------
 class VendorCreate(BaseModel):
     name: str
-    location: str
+    location: Optional[str] = None
 
 
 class VendorResponse(BaseModel):
     id: int
     name: str
-    location: str
+    location: Optional[str] = None
 
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 
-# ---------- Product ----------
+# -------- Product --------
 class ProductCreate(BaseModel):
     name: str
     price: int
@@ -36,4 +31,4 @@ class ProductResponse(BaseModel):
     vendor_id: int
 
     class Config:
-        from_attributes = True
+        orm_mode = True

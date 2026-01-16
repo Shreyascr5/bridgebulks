@@ -1,8 +1,10 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from db import get_db
 from models import Vendor, Product
+from schemas import VendorCreate, VendorResponse, ProductResponse
+
 from schemas import VendorCreate, VendorResponse, ProductResponse
 
 router = APIRouter(
