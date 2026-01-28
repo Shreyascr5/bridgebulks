@@ -1,30 +1,31 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
+from models import Customer
+from schemas import CustomerCreate, CustomerResponse
 from deps import get_db
-from models import Customer, Order
-from schemas import CustomerCreate, CustomerResponse, OrderCreate, OrderResponse
 
-router = APIRouter()
+router = APIRouter(prefix="/customers", tags=["Customers"])
+
 
 @router.post("/", response_model=CustomerResponse)
-def create_customer(payload: CustomerCreate, db: Session = Depends(get_db)):
-    customer = Customer(**payload.dict())
-    db.add(customer)
+def create_customer(customer: CustomerCreate, db: Session = Depends(get_db)):
+    existing = db.query(Customer).filter(Customer.phone == customer.phone).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Customer already exists")
+
+    new_customer = Customer(
+        name=customer.name,
+        phone=customer.phone,
+        email=customer.email
+    )
+
+    db.add(new_customer)
     db.commit()
-    db.refresh(customer)
-    return customer
+    db.refresh(new_customer)
+    return new_customer
 
 
-@router.post("/{customer_id}/orders", response_model=OrderResponse)
-def place_order(customer_id: int, payload: OrderCreate, db: Session = Depends(get_db)):
-    order = Order(customer_id=customer_id, **payload.dict())
-    db.add(order)
-    db.commit()
-    db.refresh(order)
-    return order
-
-
-@router.get("/{customer_id}/orders", response_model=list[OrderResponse])
-def list_orders(customer_id: int, db: Session = Depends(get_db)):
-    return db.query(Order).filter(Order.customer_id == customer_id).all()
+@router.get("/", response_model=list[CustomerResponse])
+def list_customers(db: Session = Depends(get_db)):
+    return db.query(Customer).all()
