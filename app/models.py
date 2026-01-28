@@ -8,33 +8,16 @@ class Vendor(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
-    location = Column(String, nullable=False)
+    location = Column(String)
 
-    products = relationship("Product", back_populates="vendor")
-
-
-class Product(Base):
-    __tablename__ = "products"
-
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
-    price = Column(Integer, nullable=False)
-    vendor_id = Column(Integer, ForeignKey("vendors.id"))
-
-    vendor = relationship("Vendor", back_populates="products")
+    bulk_orders = relationship("BulkOrder", back_populates="vendor")
 
 
 class BulkOrder(Base):
     __tablename__ = "bulk_orders"
 
     id = Column(Integer, primary_key=True, index=True)
+    total_quantity = Column(Integer, nullable=False)
+
     vendor_id = Column(Integer, ForeignKey("vendors.id"))
-
-
-class BulkOrderItem(Base):
-    __tablename__ = "bulk_order_items"
-
-    id = Column(Integer, primary_key=True, index=True)
-    bulk_order_id = Column(Integer, ForeignKey("bulk_orders.id"))
-    product_id = Column(Integer, ForeignKey("products.id"))
-    quantity = Column(Integer)
+    vendor = relationship("Vendor", back_populates="bulk_orders")

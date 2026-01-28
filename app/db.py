@@ -4,7 +4,7 @@ import os
 
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql://postgres:postgres@postgres:5432/postgres"
+    "postgresql://postgres:postgres@postgres:5432/bridgebulks"
 )
 
 engine = create_engine(DATABASE_URL)
