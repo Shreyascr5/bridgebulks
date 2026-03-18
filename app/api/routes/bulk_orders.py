@@ -9,38 +9,35 @@ router = APIRouter(prefix="/bulk-orders", tags=["Bulk Orders"])
 
 @router.post("/", response_model=BulkOrderResponse)
 def create_bulk_order(payload: BulkOrderCreate, db: Session = Depends(get_db)):
-    
-    # 1️⃣ Create bulk order
-    order = BulkOrder(vendor_id=payload.vendor_id)
+
+    total_price = 0
+    response_items = []
+
+    order = BulkOrder(vendor_id=None)
     db.add(order)
     db.commit()
     db.refresh(order)
 
-    response_items = []
-    total_price = 0
-
-    # 2️⃣ Loop through items
     for item in payload.items:
 
-        # 🔍 Get product
-        product = db.query(Product).filter(Product.id == item.product_id).first()
-
-        # 🔍 Get price from VendorProduct
-        vp = db.query(VendorProduct).filter(
-            VendorProduct.vendor_id == payload.vendor_id,
+        vps = db.query(VendorProduct).filter(
             VendorProduct.product_id == item.product_id
-        ).first()
+        ).all()
 
-        if not vp:
-            raise Exception(f"No price set for product {item.product_id}")
+        if not vps:
+            raise Exception(f"No pricing for product {item.product_id}")
 
-        item_total = item.quantity * vp.price
+        cheapest_vp = min(vps, key=lambda x: x.price)
+
+        item_total = item.quantity * cheapest_vp.price
         total_price += item_total
 
-        # 3️⃣ Save item
+        product = db.query(Product).filter(Product.id == item.product_id).first()
+
         order_item = BulkOrderItem(
             bulk_order_id=order.id,
             product_id=item.product_id,
+            vendor_id=cheapest_vp.vendor_id,   # STORE VENDOR
             quantity=item.quantity
         )
         db.add(order_item)
@@ -52,15 +49,14 @@ def create_bulk_order(payload: BulkOrderCreate, db: Session = Depends(get_db)):
                 id=order_item.id,
                 product_id=product.id,
                 product_name=product.name,
+                vendor_id=cheapest_vp.vendor_id,   #  RETURN VENDOR
                 quantity=item.quantity
             )
         )
 
-    # 🔥 PRINT total (for now)
-    print("TOTAL PRICE:", total_price)
-
     return {
         "id": order.id,
-        "vendor_id": order.vendor_id,
+        "vendor_id": None,
+        "total_price": total_price,
         "items": response_items
     }

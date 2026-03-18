@@ -1,7 +1,10 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 
-# Vendor
+# -----------------------
+# VENDOR
+# -----------------------
+
 class VendorCreate(BaseModel):
     name: str
 
@@ -13,7 +16,10 @@ class VendorResponse(BaseModel):
         from_attributes = True
 
 
-# Product
+# -----------------------
+# PRODUCT
+# -----------------------
+
 class ProductCreate(BaseModel):
     name: str
     unit: str
@@ -27,41 +33,54 @@ class ProductResponse(BaseModel):
         from_attributes = True
 
 
-# Vendor Product (PRICE)
+# -----------------------
+# VENDOR PRODUCT (PRICING)
+# -----------------------
+
 class VendorProductCreate(BaseModel):
     vendor_id: int
     product_id: int
     price: float
 
-class VendorProductResponse(VendorProductCreate):
+class VendorProductResponse(BaseModel):
     id: int
+    vendor_id: int
+    product_id: int
+    price: float
 
     class Config:
         from_attributes = True
 
 
-# Bulk Order
+# -----------------------
+# BULK ORDER ITEMS
+# -----------------------
+
 class BulkOrderItemCreate(BaseModel):
     product_id: int
-    quantity: float
-
+    quantity: int
 
 class BulkOrderItemResponse(BaseModel):
     id: int
     product_id: int
-    product_name: str
-    quantity: float
+    quantity: int
 
     class Config:
         from_attributes = True
 
 
-class BulkOrderCreate(BaseModel):
-    vendor_id: int
-    items: List[BulkOrderItemCreate]
+# -----------------------
+# BULK ORDER
+# -----------------------
 
+class BulkOrderCreate(BaseModel):
+    items: List[BulkOrderItemCreate]
 
 class BulkOrderResponse(BaseModel):
     id: int
     vendor_id: int
+    total_price: Optional[float]
     items: List[BulkOrderItemResponse]
+
+    class Config:
+        from_attributes = True

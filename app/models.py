@@ -33,9 +33,11 @@ class BulkOrder(Base):
 
 class BulkOrderItem(Base):
     __tablename__ = "bulk_order_items"
+
     id = Column(Integer, primary_key=True)
     bulk_order_id = Column(Integer, ForeignKey("bulk_orders.id"))
     product_id = Column(Integer, ForeignKey("products.id"))
+    vendor_id = Column(Integer, ForeignKey("vendors.id"))   # ✅ NEW
     quantity = Column(Float, nullable=False)
 
     bulk_order = relationship("BulkOrder", back_populates="items")
