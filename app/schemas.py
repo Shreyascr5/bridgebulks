@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from typing import List
 
-# ---------- Vendor ----------
+# Vendor
 class VendorCreate(BaseModel):
     name: str
 
@@ -13,7 +13,7 @@ class VendorResponse(BaseModel):
         from_attributes = True
 
 
-# ---------- Product ----------
+# Product
 class ProductCreate(BaseModel):
     name: str
     unit: str
@@ -27,7 +27,20 @@ class ProductResponse(BaseModel):
         from_attributes = True
 
 
-# ---------- Bulk Order ----------
+# Vendor Product (PRICE)
+class VendorProductCreate(BaseModel):
+    vendor_id: int
+    product_id: int
+    price: float
+
+class VendorProductResponse(VendorProductCreate):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+
+# Bulk Order
 class BulkOrderItemCreate(BaseModel):
     product_id: int
     quantity: float
