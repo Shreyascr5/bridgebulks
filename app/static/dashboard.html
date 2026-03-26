@@ -1,0 +1,98 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Bulk Order Analytics Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      body {
+        font-family: Arial;
+        margin: 40px;
+        background: #f4f6f8;
+      }
+      .card {
+        display: inline-block;
+        background: white;
+        padding: 20px;
+        margin: 10px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        width: 200px;
+        text-align: center;
+      }
+      canvas {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>📊 Procurement Analytics Dashboard</h1>
+
+    <div class="card">
+      <h3>Total Orders</h3>
+      <p id="orders">0</p>
+    </div>
+
+    <div class="card">
+      <h3>Total Revenue</h3>
+      <p id="revenue">0</p>
+    </div>
+
+    <div class="card">
+      <h3>Avg Order Value</h3>
+      <p id="avg">0</p>
+    </div>
+
+    <h2>Vendor Revenue</h2>
+    <canvas id="revenueChart"></canvas>
+
+    <h2>Vendor Selection Share</h2>
+    <canvas id="ordersChart"></canvas>
+
+    <script>
+      fetch("http://127.0.0.1:8000/analytics/")
+        .then((response) => response.json())
+        .then((data) => {
+          document.getElementById("orders").innerText = data.total_bulk_orders;
+          document.getElementById("revenue").innerText = data.total_revenue;
+          document.getElementById("avg").innerText = data.average_order_value;
+
+          const vendorNames = data.vendor_performance.map((v) => v.vendor_name);
+          const vendorRevenue = data.vendor_performance.map(
+            (v) => v.total_revenue,
+          );
+          const vendorOrders = data.vendor_performance.map(
+            (v) => v.times_selected,
+          );
+
+          new Chart(document.getElementById("revenueChart"), {
+            type: "bar",
+            data: {
+              labels: vendorNames,
+              datasets: [
+                {
+                  label: "Revenue",
+                  data: vendorRevenue,
+                },
+              ],
+            },
+          });
+
+          new Chart(document.getElementById("ordersChart"), {
+            type: "pie",
+            data: {
+              labels: vendorNames,
+              datasets: [
+                {
+                  label: "Orders",
+                  data: vendorOrders,
+                },
+              ],
+            },
+          });
+        });
+    </script>
+  </body>
+</html>
