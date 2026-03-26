@@ -1,62 +1,89 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from models import BulkOrder, BulkOrderItem, VendorProduct, Product
-from schemas import BulkOrderCreate, BulkOrderResponse, BulkOrderItemResponse
-from deps import get_db
+from db import SessionLocal
+import models, schemas
 
 router = APIRouter(prefix="/bulk-orders", tags=["Bulk Orders"])
 
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
-@router.post("/", response_model=BulkOrderResponse)
-def create_bulk_order(payload: BulkOrderCreate, db: Session = Depends(get_db)):
 
+# CREATE BULK ORDER
+@router.post("/", response_model=schemas.BulkOrderResponse)
+def create_bulk_order(order: schemas.BulkOrderCreate, db: Session = Depends(get_db)):
     total_price = 0
-    response_items = []
-
-    order = BulkOrder(vendor_id=None)
-    db.add(order)
+    db_order = models.BulkOrder(vendor_id=None, total_price=0)
+    db.add(db_order)
     db.commit()
-    db.refresh(order)
+    db.refresh(db_order)
 
-    for item in payload.items:
+    items_response = []
 
-        vps = db.query(VendorProduct).filter(
-            VendorProduct.product_id == item.product_id
-        ).all()
+    for item in order.items:
+        vendor_price = db.query(models.VendorProduct)\
+            .filter(models.VendorProduct.product_id == item.product_id)\
+            .order_by(models.VendorProduct.price.asc())\
+            .first()
 
-        if not vps:
-            raise Exception(f"No pricing for product {item.product_id}")
-
-        cheapest_vp = min(vps, key=lambda x: x.price)
-
-        item_total = item.quantity * cheapest_vp.price
+        item_total = vendor_price.price * item.quantity
         total_price += item_total
 
-        product = db.query(Product).filter(Product.id == item.product_id).first()
-
-        order_item = BulkOrderItem(
-            bulk_order_id=order.id,
+        db_item = models.BulkOrderItem(
+            order_id=db_order.id,
             product_id=item.product_id,
-            vendor_id=cheapest_vp.vendor_id,   # STORE VENDOR
+            vendor_id=vendor_price.vendor_id,
             quantity=item.quantity
         )
-        db.add(order_item)
+        db.add(db_item)
         db.commit()
-        db.refresh(order_item)
 
-        response_items.append(
-            BulkOrderItemResponse(
-                id=order_item.id,
-                product_id=product.id,
-                product_name=product.name,
-                vendor_id=cheapest_vp.vendor_id,   #  RETURN VENDOR
-                quantity=item.quantity
-            )
-        )
+        items_response.append({
+            "product_id": item.product_id,
+            "quantity": item.quantity,
+            "vendor_id": vendor_price.vendor_id
+        })
+
+    db_order.total_price = total_price
+    db.commit()
+    db.refresh(db_order)
 
     return {
-        "id": order.id,
+        "id": db_order.id,
         "vendor_id": None,
         "total_price": total_price,
-        "items": response_items
+        "items": items_response
     }
+
+
+# GET ORDER HISTORY
+@router.get("/", response_model=list[schemas.BulkOrderResponse])
+def get_all_orders(db: Session = Depends(get_db)):
+    orders = db.query(models.BulkOrder).all()
+
+    result = []
+    for order in orders:
+        items = db.query(models.BulkOrderItem).filter(
+            models.BulkOrderItem.order_id == order.id
+        ).all()
+
+        item_list = []
+        for item in items:
+            item_list.append({
+                "product_id": item.product_id,
+                "quantity": item.quantity,
+                "vendor_id": item.vendor_id
+            })
+
+        result.append({
+            "id": order.id,
+            "vendor_id": order.vendor_id,
+            "total_price": order.total_price,
+            "items": item_list
+        })
+
+    return result

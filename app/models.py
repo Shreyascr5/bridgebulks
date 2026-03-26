@@ -4,41 +4,36 @@ from db import Base
 
 class Vendor(Base):
     __tablename__ = "vendors"
-    id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
-
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String)
 
 class Product(Base):
     __tablename__ = "products"
-    id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
-    unit = Column(String, nullable=False)
-
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String)
+    unit = Column(String)
 
 class VendorProduct(Base):
     __tablename__ = "vendor_products"
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, index=True)
     vendor_id = Column(Integer, ForeignKey("vendors.id"))
     product_id = Column(Integer, ForeignKey("products.id"))
-    price = Column(Float, nullable=False)
-
+    price = Column(Float)
 
 class BulkOrder(Base):
     __tablename__ = "bulk_orders"
-    id = Column(Integer, primary_key=True)
-    vendor_id = Column(Integer, ForeignKey("vendors.id"))
+    id = Column(Integer, primary_key=True, index=True)
+    vendor_id = Column(Integer, nullable=True)
+    total_price = Column(Float, default=0)
 
-    items = relationship("BulkOrderItem", back_populates="bulk_order")
-
+    items = relationship("BulkOrderItem", back_populates="order")
 
 class BulkOrderItem(Base):
     __tablename__ = "bulk_order_items"
-
-    id = Column(Integer, primary_key=True)
-    bulk_order_id = Column(Integer, ForeignKey("bulk_orders.id"))
+    id = Column(Integer, primary_key=True, index=True)
+    order_id = Column(Integer, ForeignKey("bulk_orders.id"))
     product_id = Column(Integer, ForeignKey("products.id"))
-    vendor_id = Column(Integer, ForeignKey("vendors.id"))   # ✅ NEW
-    quantity = Column(Float, nullable=False)
+    vendor_id = Column(Integer, ForeignKey("vendors.id"))
+    quantity = Column(Integer)
 
-    bulk_order = relationship("BulkOrder", back_populates="items")
-    product = relationship("Product")
+    order = relationship("BulkOrder", back_populates="items")

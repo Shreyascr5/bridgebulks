@@ -1,19 +1,21 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from models import VendorProduct
-from schemas import VendorProductCreate, VendorProductResponse
-from deps import get_db
+from db import SessionLocal
+import models, schemas
 
-router = APIRouter(prefix="/vendor-products", tags=["Vendor Products"])
+router = APIRouter(prefix="/vendor-products", tags=["Vendor Pricing"])
 
-@router.post("/", response_model=VendorProductResponse)
-def create_vendor_product(payload: VendorProductCreate, db: Session = Depends(get_db)):
-    vp = VendorProduct(**payload.dict())
-    db.add(vp)
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+@router.post("/")
+def create_vendor_product(vp: schemas.VendorProductCreate, db: Session = Depends(get_db)):
+    db_vp = models.VendorProduct(**vp.dict())
+    db.add(db_vp)
     db.commit()
-    db.refresh(vp)
-    return vp
-
-@router.get("/", response_model=list[VendorProductResponse])
-def list_vendor_products(db: Session = Depends(get_db)):
-    return db.query(VendorProduct).all()
+    db.refresh(db_vp)
+    return db_vp
