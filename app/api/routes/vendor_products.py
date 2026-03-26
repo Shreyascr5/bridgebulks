@@ -13,9 +13,9 @@ def get_db():
         db.close()
 
 @router.post("/")
-def create_vendor_product(vp: schemas.VendorProductCreate, db: Session = Depends(get_db)):
-    db_vp = models.VendorProduct(**vp.dict())
-    db.add(db_vp)
+def create_vendor_product(data: schemas.VendorProductCreate, db: Session = Depends(get_db)):
+    vp = models.VendorProduct(**data.dict())
+    db.add(vp)
     db.commit()
-    db.refresh(db_vp)
-    return db_vp
+    db.refresh(vp)
+    return vp

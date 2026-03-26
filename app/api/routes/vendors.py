@@ -14,7 +14,7 @@ def get_db():
 
 @router.post("/", response_model=schemas.VendorResponse)
 def create_vendor(vendor: schemas.VendorCreate, db: Session = Depends(get_db)):
-    db_vendor = models.Vendor(name=vendor.name)
+    db_vendor = models.Vendor(**vendor.dict())
     db.add(db_vendor)
     db.commit()
     db.refresh(db_vendor)

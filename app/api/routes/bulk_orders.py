@@ -13,77 +13,74 @@ def get_db():
         db.close()
 
 
-# CREATE BULK ORDER
 @router.post("/", response_model=schemas.BulkOrderResponse)
 def create_bulk_order(order: schemas.BulkOrderCreate, db: Session = Depends(get_db)):
+
     total_price = 0
-    db_order = models.BulkOrder(vendor_id=None, total_price=0)
+    order_items_response = []
+
+    db_order = models.BulkOrder(total_price=0)
     db.add(db_order)
     db.commit()
     db.refresh(db_order)
 
-    items_response = []
-
     for item in order.items:
-        vendor_price = db.query(models.VendorProduct)\
-            .filter(models.VendorProduct.product_id == item.product_id)\
-            .order_by(models.VendorProduct.price.asc())\
-            .first()
+        product_id = item.product_id
+        quantity = item.quantity
 
-        item_total = vendor_price.price * item.quantity
-        total_price += item_total
+        vendor_prices = db.query(models.VendorProduct).filter(
+            models.VendorProduct.product_id == product_id
+        ).all()
+
+        best_vendor = None
+        best_score = 999999
+        best_price = 0
+        best_rating = 0
+        best_distance = 0
+
+        for vp in vendor_prices:
+            vendor = db.query(models.Vendor).filter(models.Vendor.id == vp.vendor_id).first()
+
+            score = (1.0 * vp.price) + (0.5 * vendor.distance) - (0.5 * vendor.rating)
+
+            if score < best_score:
+                best_score = score
+                best_vendor = vendor
+                best_price = vp.price
+                best_rating = vendor.rating
+                best_distance = vendor.distance
+
+        item_price = best_price * quantity
+        total_price += item_price
+
+        # Update vendor performance
+        best_vendor.total_orders += 1
+        best_vendor.total_quantity_supplied += quantity
+        best_vendor.total_revenue += item_price
 
         db_item = models.BulkOrderItem(
             order_id=db_order.id,
-            product_id=item.product_id,
-            vendor_id=vendor_price.vendor_id,
-            quantity=item.quantity
+            product_id=product_id,
+            quantity=quantity,
+            vendor_id=best_vendor.id
         )
         db.add(db_item)
-        db.commit()
 
-        items_response.append({
-            "product_id": item.product_id,
-            "quantity": item.quantity,
-            "vendor_id": vendor_price.vendor_id
+        order_items_response.append({
+            "product_id": product_id,
+            "quantity": quantity,
+            "vendor_id": best_vendor.id,
+            "price": best_price,
+            "rating": best_rating,
+            "distance": best_distance,
+            "score": best_score
         })
 
     db_order.total_price = total_price
     db.commit()
-    db.refresh(db_order)
 
     return {
         "id": db_order.id,
-        "vendor_id": None,
         "total_price": total_price,
-        "items": items_response
+        "items": order_items_response
     }
-
-
-# GET ORDER HISTORY
-@router.get("/", response_model=list[schemas.BulkOrderResponse])
-def get_all_orders(db: Session = Depends(get_db)):
-    orders = db.query(models.BulkOrder).all()
-
-    result = []
-    for order in orders:
-        items = db.query(models.BulkOrderItem).filter(
-            models.BulkOrderItem.order_id == order.id
-        ).all()
-
-        item_list = []
-        for item in items:
-            item_list.append({
-                "product_id": item.product_id,
-                "quantity": item.quantity,
-                "vendor_id": item.vendor_id
-            })
-
-        result.append({
-            "id": order.id,
-            "vendor_id": order.vendor_id,
-            "total_price": order.total_price,
-            "items": item_list
-        })
-
-    return result
