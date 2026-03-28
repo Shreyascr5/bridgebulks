@@ -1,33 +1,33 @@
 services:
   postgres:
     image: postgres:15
+    container_name: bulk_postgres
     environment:
-      POSTGRES_USER: bridgebulks
-      POSTGRES_PASSWORD: bridgebulks
-      POSTGRES_DB: bridgebulks
-    volumes:
-      - pg_data:/var/lib/postgresql/data
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: bulkdb
     ports:
       - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
 
   redis:
     image: redis:7
+    container_name: bulk_redis
     ports:
       - "6379:6379"
 
   api:
     build: .
-    command: sh -c "sleep 5 && uvicorn main:app --host 0.0.0.0 --port 8000"
-
-    volumes:
-      - ./app:/app
-    ports:
-      - "8000:8000"
-    environment:              # ✅ MUST be key-value
-      DATABASE_URL: postgresql://bridgebulks:bridgebulks@postgres:5432/bridgebulks
+    container_name: bulk_api
     depends_on:
       - postgres
       - redis
+    ports:
+      - "8000:8000"
+    command: sh -c "sleep 10 && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+    volumes:
+      - ./app:/code/app
 
 volumes:
   pg_data:

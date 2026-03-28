@@ -1,24 +1,24 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from db import init_db
+from app.api.routes import vendors, products, vendor_products, bulk_orders, customers, analytics, vendor_performance
 
-from api.routes.vendors import router as vendor_router
-from api.routes.products import router as product_router
-from api.routes.vendor_products import router as vendor_product_router
-from api.routes.bulk_orders import router as bulk_order_router
-from api.routes.analytics import router as analytics_router
+from app.db import engine, Base
+import app.models  # This registers the models
 
 app = FastAPI()
 
-@app.on_event("startup")
-def startup():
-    init_db()
+# Create database tables
+Base.metadata.create_all(bind=engine)
 
-app.include_router(vendor_router)
-app.include_router(product_router)
-app.include_router(vendor_product_router)
-app.include_router(bulk_order_router)
-app.include_router(analytics_router)
+# Include routers
+app.include_router(vendors.router)
+app.include_router(products.router)
+app.include_router(vendor_products.router)
+app.include_router(bulk_orders.router)
+app.include_router(customers.router)
+app.include_router(analytics.router)
+app.include_router(vendor_performance.router)
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+# Static dashboard
+app.mount("/static", StaticFiles(directory="app/static"), name="static")

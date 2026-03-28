@@ -1,21 +1,18 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from db import SessionLocal
-import models, schemas
+from app.db import get_db
+from app import models, schemas
 
 router = APIRouter(prefix="/vendors", tags=["Vendors"])
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-@router.post("/", response_model=schemas.VendorResponse)
+@router.post("/")
 def create_vendor(vendor: schemas.VendorCreate, db: Session = Depends(get_db)):
-    db_vendor = models.Vendor(**vendor.dict())
-    db.add(db_vendor)
+    new_vendor = models.Vendor(name=vendor.name)
+    db.add(new_vendor)
     db.commit()
-    db.refresh(db_vendor)
-    return db_vendor
+    db.refresh(new_vendor)
+    return new_vendor
+
+@router.get("/")
+def get_vendors(db: Session = Depends(get_db)):
+    return db.query(models.Vendor).all()

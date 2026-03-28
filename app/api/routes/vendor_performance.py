@@ -1,36 +1,22 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from db import SessionLocal
-import models
+from sqlalchemy import func
+from app.db import get_db
+from app import models
 
 router = APIRouter(prefix="/vendor-performance", tags=["Vendor Performance"])
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
 @router.get("/")
-def get_vendor_performance(db: Session = Depends(get_db)):
-    vendors = db.query(models.Vendor).all()
+def vendor_performance(db: Session = Depends(get_db)):
+    results = (
+        db.query(
+            models.Vendor.name,
+            func.sum(models.BulkOrderItem.quantity * models.BulkOrderItem.price_at_order_time).label("revenue"),
+            func.count(models.BulkOrderItem.id).label("orders")
+        )
+        .join(models.BulkOrderItem.vendor_id == models.Vendor.id)
+        .group_by(models.Vendor.name)
+        .all()
+    )
 
-    result = []
-    for v in vendors:
-        avg_price = 0
-        if v.total_quantity_supplied > 0:
-            avg_price = v.total_revenue / v.total_quantity_supplied
-
-        result.append({
-            "vendor_id": v.id,
-            "name": v.name,
-            "total_orders": v.total_orders,
-            "total_quantity_supplied": v.total_quantity_supplied,
-            "total_revenue": v.total_revenue,
-            "average_price": avg_price,
-            "rating": v.rating,
-            "distance": v.distance
-        })
-
-    return result
+    return results
