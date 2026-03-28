@@ -1,98 +1,100 @@
 <!doctype html>
 <html>
   <head>
-    <title>Bulk Order Analytics Dashboard</title>
+    <title>Bulk Order Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-      body {
-        font-family: Arial;
-        margin: 40px;
-        background: #f4f6f8;
-      }
-      .card {
-        display: inline-block;
-        background: white;
-        padding: 20px;
-        margin: 10px;
-        border-radius: 10px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        width: 200px;
-        text-align: center;
-      }
-      canvas {
-        background: white;
-        padding: 20px;
-        border-radius: 10px;
-        margin-top: 20px;
-      }
-    </style>
   </head>
   <body>
-    <h1>📊 Procurement Analytics Dashboard</h1>
+    <h1>Bulk Procurement Dashboard</h1>
 
-    <div class="card">
-      <h3>Total Orders</h3>
-      <p id="orders">0</p>
+    <div>
+      <h3>Total Orders: <span id="totalOrders"></span></h3>
+      <h3>Total Revenue: ₹ <span id="totalRevenue"></span></h3>
+      <h3>Average Order Value: ₹ <span id="avgOrder"></span></h3>
     </div>
 
-    <div class="card">
-      <h3>Total Revenue</h3>
-      <p id="revenue">0</p>
-    </div>
-
-    <div class="card">
-      <h3>Avg Order Value</h3>
-      <p id="avg">0</p>
-    </div>
-
-    <h2>Vendor Revenue</h2>
-    <canvas id="revenueChart"></canvas>
-
-    <h2>Vendor Selection Share</h2>
-    <canvas id="ordersChart"></canvas>
+    <canvas id="monthlyChart" width="400" height="200"></canvas>
+    <canvas id="topProductsChart" width="400" height="200"></canvas>
+    <canvas id="vendorRevenueChart" width="400" height="200"></canvas>
+    <canvas id="orderTrendChart" width="400" height="200"></canvas>
 
     <script>
-      fetch("http://127.0.0.1:8000/analytics/")
-        .then((response) => response.json())
-        .then((data) => {
-          document.getElementById("orders").innerText = data.total_bulk_orders;
-          document.getElementById("revenue").innerText = data.total_revenue;
-          document.getElementById("avg").innerText = data.average_order_value;
+      async function loadDashboard() {
+        const analytics = await fetch("/analytics/").then((res) => res.json());
+        document.getElementById("totalOrders").innerText =
+          analytics.total_orders;
+        document.getElementById("totalRevenue").innerText =
+          analytics.total_revenue;
+        document.getElementById("avgOrder").innerText =
+          analytics.average_order_value;
 
-          const vendorNames = data.vendor_performance.map((v) => v.vendor_name);
-          const vendorRevenue = data.vendor_performance.map(
-            (v) => v.total_revenue,
-          );
-          const vendorOrders = data.vendor_performance.map(
-            (v) => v.times_selected,
-          );
+        const monthly = await fetch("/analytics/monthly").then((res) =>
+          res.json(),
+        );
+        const topProducts = await fetch("/analytics/top-products").then((res) =>
+          res.json(),
+        );
+        const vendorRevenue = await fetch("/analytics/vendor-revenue").then(
+          (res) => res.json(),
+        );
+        const orderTrend = await fetch("/analytics/order-trend").then((res) =>
+          res.json(),
+        );
 
-          new Chart(document.getElementById("revenueChart"), {
-            type: "bar",
-            data: {
-              labels: vendorNames,
-              datasets: [
-                {
-                  label: "Revenue",
-                  data: vendorRevenue,
-                },
-              ],
-            },
-          });
-
-          new Chart(document.getElementById("ordersChart"), {
-            type: "pie",
-            data: {
-              labels: vendorNames,
-              datasets: [
-                {
-                  label: "Orders",
-                  data: vendorOrders,
-                },
-              ],
-            },
-          });
+        new Chart(document.getElementById("monthlyChart"), {
+          type: "bar",
+          data: {
+            labels: monthly.map((m) => m.month),
+            datasets: [
+              {
+                label: "Monthly Spending",
+                data: monthly.map((m) => m.total),
+              },
+            ],
+          },
         });
+
+        new Chart(document.getElementById("topProductsChart"), {
+          type: "bar",
+          data: {
+            labels: topProducts.map((p) => "Product " + p.product_id),
+            datasets: [
+              {
+                label: "Top Products",
+                data: topProducts.map((p) => p.total_quantity),
+              },
+            ],
+          },
+        });
+
+        new Chart(document.getElementById("vendorRevenueChart"), {
+          type: "pie",
+          data: {
+            labels: vendorRevenue.map((v) => "Vendor " + v.vendor_id),
+            datasets: [
+              {
+                label: "Vendor Revenue",
+                data: vendorRevenue.map((v) => v.revenue),
+              },
+            ],
+          },
+        });
+
+        new Chart(document.getElementById("orderTrendChart"), {
+          type: "line",
+          data: {
+            labels: orderTrend.map((o) => o.date),
+            datasets: [
+              {
+                label: "Orders Over Time",
+                data: orderTrend.map((o) => o.orders),
+              },
+            ],
+          },
+        });
+      }
+
+      loadDashboard();
     </script>
   </body>
 </html>

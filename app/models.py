@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from app.db import Base
-import datetime
+from datetime import datetime
 
 
 class Vendor(Base):
@@ -34,10 +34,12 @@ class Customer(Base):
 
 class BulkOrder(Base):
     __tablename__ = "bulk_orders"
+
     id = Column(Integer, primary_key=True, index=True)
-    order_date = Column(DateTime, default=datetime.datetime.utcnow)
-    total_price = Column(Float)
     customer_id = Column(Integer, ForeignKey("customers.id"))
+    total_price = Column(Float)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
     items = relationship("BulkOrderItem", back_populates="order")
 
 
