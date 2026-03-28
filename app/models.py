@@ -6,9 +6,13 @@ from datetime import datetime
 
 class Vendor(Base):
     __tablename__ = "vendors"
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, unique=True)
 
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, index=True)
+
+    rating = Column(Float, default=4.0)
+    delivery_time = Column(Integer, default=3)
+    reliability_score = Column(Float, default=0.9)
 
 class Product(Base):
     __tablename__ = "products"

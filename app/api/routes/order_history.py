@@ -1,47 +1,46 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.db import get_db
-from app import models
+from app.models import BulkOrder, BulkOrderItem, Vendor, Product
 
 router = APIRouter(prefix="/order-history", tags=["Order History"])
 
 
-@router.get("/")
-def get_all_orders(db: Session = Depends(get_db)):
-    orders = db.query(models.BulkOrder).all()
-
+@router.get("/customer/{customer_id}")
+def get_customer_orders(customer_id: int, db: Session = Depends(get_db)):
+    orders = db.query(BulkOrder).filter(BulkOrder.customer_id == customer_id).all()
     result = []
+
     for order in orders:
-        order_data = {
+        items = db.query(BulkOrderItem).filter(BulkOrderItem.order_id == order.id).all()
+        result.append({
             "order_id": order.id,
-            "customer_id": order.customer_id,
             "total_price": order.total_price,
-            "created_at": order.created_at,
-            "items": []
-        }
-
-        for item in order.items:
-            order_data["items"].append({
-                "product_id": item.product_id,
-                "vendor_id": item.vendor_id,
-                "quantity": item.quantity
-            })
-
-        result.append(order_data)
+            "items": [
+                {
+                    "product_id": i.product_id,
+                    "vendor_id": i.vendor_id,
+                    "quantity": i.quantity
+                }
+                for i in items
+            ]
+        })
 
     return result
 
 
-@router.get("/customer/{customer_id}")
-def get_customer_orders(customer_id: int, db: Session = Depends(get_db)):
-    orders = db.query(models.BulkOrder).filter(models.BulkOrder.customer_id == customer_id).all()
-
+@router.get("/vendor/{vendor_id}")
+def get_vendor_orders(vendor_id: int, db: Session = Depends(get_db)):
+    items = db.query(BulkOrderItem).filter(BulkOrderItem.vendor_id == vendor_id).all()
     result = []
-    for order in orders:
+
+    for item in items:
+        order = db.query(BulkOrder).filter(BulkOrder.id == item.order_id).first()
         result.append({
             "order_id": order.id,
-            "total_price": order.total_price,
-            "created_at": order.created_at
+            "product_id": item.product_id,
+            "quantity": item.quantity,
+            "total_order_price": order.total_price
         })
 
     return result

@@ -1,27 +1,35 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 
 
-# --------------------
-# VENDOR
-# --------------------
+# -----------------------
+# Vendor
+# -----------------------
 class VendorCreate(BaseModel):
     name: str
+    rating: float = 4.0
+    delivery_time: int = 3
+    reliability_score: float = 0.9
+
 
 class VendorResponse(BaseModel):
     id: int
     name: str
+    rating: float
+    delivery_time: int
+    reliability_score: float
 
     class Config:
         from_attributes = True
 
 
-# --------------------
-# PRODUCT
-# --------------------
+# -----------------------
+# Product
+# -----------------------
 class ProductCreate(BaseModel):
     name: str
     unit: str
+
 
 class ProductResponse(BaseModel):
     id: int
@@ -32,12 +40,32 @@ class ProductResponse(BaseModel):
         from_attributes = True
 
 
-# --------------------
-# CUSTOMER
-# --------------------
+# -----------------------
+# Vendor Product (Price Mapping)
+# -----------------------
+class VendorProductCreate(BaseModel):
+    vendor_id: int
+    product_id: int
+    price: float
+
+
+class VendorProductResponse(BaseModel):
+    id: int
+    vendor_id: int
+    product_id: int
+    price: float
+
+    class Config:
+        from_attributes = True
+
+
+# -----------------------
+# Customer
+# -----------------------
 class CustomerCreate(BaseModel):
     name: str
     email: str
+
 
 class CustomerResponse(BaseModel):
     id: int
@@ -48,22 +76,27 @@ class CustomerResponse(BaseModel):
         from_attributes = True
 
 
-# --------------------
-# VENDOR PRODUCT PRICING
-# --------------------
-class VendorProductCreate(BaseModel):
-    vendor_id: int
-    product_id: int
-    price: float
-
-
-# --------------------
-# BULK ORDER
-# --------------------
+# -----------------------
+# Bulk Order
+# -----------------------
 class BulkOrderItemCreate(BaseModel):
     product_id: int
     quantity: int
 
+
 class BulkOrderCreate(BaseModel):
     customer_id: int
     items: List[BulkOrderItemCreate]
+
+
+class BulkOrderItemResponse(BaseModel):
+    product_id: int
+    quantity: int
+    vendor_id: int
+
+
+class BulkOrderResponse(BaseModel):
+    id: int
+    customer_id: int
+    total_price: float
+    items: List[BulkOrderItemResponse]
