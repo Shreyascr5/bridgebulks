@@ -16,6 +16,8 @@ from app.api.routes import (
     vendor_rating,
     order_status
 )
+from fastapi.middleware.cors import CORSMiddleware
+
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -33,3 +35,11 @@ app.include_router(vendor_rating.router)
 app.include_router(order_status.router)
 
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
