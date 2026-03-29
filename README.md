@@ -61,5 +61,4 @@ The system selects vendors using:
 
 ## Author
 
-Shreyas C R  
-M.Tech CSE Project
+Shreyas C R
