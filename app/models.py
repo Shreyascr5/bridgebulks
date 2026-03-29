@@ -45,9 +45,7 @@ class BulkOrder(Base):
     id = Column(Integer, primary_key=True, index=True)
     customer_id = Column(Integer, ForeignKey("customers.id"))
     total_price = Column(Float)
-    created_at = Column(DateTime, default=datetime.utcnow)
-
-    items = relationship("BulkOrderItem", back_populates="order")
+    status = Column(String, default="Placed")
 
 
 class BulkOrderItem(Base):

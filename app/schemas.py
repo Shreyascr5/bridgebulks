@@ -125,3 +125,12 @@ class VendorRatingCreate(BaseModel):
 
 class VendorRatingResponse(BaseModel):
     message: str
+
+    
+class OrderStatusUpdate(BaseModel):
+    order_id: int
+    status: str
+
+
+class OrderStatusResponse(BaseModel):
+    message: str
