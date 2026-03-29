@@ -12,7 +12,8 @@ from app.api.routes import (
     customers,
     analytics,
     auth,
-    vendor_performance
+    vendor_performance,
+    vendor_rating
 )
 
 models.Base.metadata.create_all(bind=engine)
@@ -27,5 +28,6 @@ app.include_router(customers.router)
 app.include_router(analytics.router)
 app.include_router(auth.router)
 app.include_router(vendor_performance.router)
+app.include_router(vendor_rating.router)
 
 app.mount("/static", StaticFiles(directory="app/static"), name="static")

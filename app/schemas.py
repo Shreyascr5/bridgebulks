@@ -115,3 +115,13 @@ class CustomerLogin(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
+
+class VendorRatingCreate(BaseModel):
+    order_id: int
+    vendor_id: int
+    rating: float
+    delivery_time: int
+
+
+class VendorRatingResponse(BaseModel):
+    message: str
