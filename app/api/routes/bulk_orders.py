@@ -4,25 +4,45 @@ from app.db import get_db
 from app import models, schemas
 from app.models import VendorProduct, Vendor, BulkOrder, BulkOrderItem, VendorPerformance
 from app.auth import get_current_user
+from app.redis_client import redis_client
+import json
 
 router = APIRouter(prefix="/bulk-orders", tags=["Bulk Orders"])
 
 
 def select_best_vendor(db, product_id, quantity):
-    vendors = db.query(
-        VendorProduct.vendor_id,
-        VendorProduct.price,
-        Vendor.rating,
-        Vendor.delivery_time
-    ).join(Vendor, Vendor.id == VendorProduct.vendor_id)\
-     .filter(VendorProduct.product_id == product_id).all()
+    cache_key = f"vendor_prices:{product_id}"
+    cached_data = redis_client.get(cache_key)
+
+    if cached_data:
+        vendors = json.loads(cached_data)
+    else:
+        vendors = db.query(
+            VendorProduct.vendor_id,
+            VendorProduct.price,
+            Vendor.rating,
+            Vendor.delivery_time
+        ).join(Vendor, Vendor.id == VendorProduct.vendor_id)\
+         .filter(VendorProduct.product_id == product_id).all()
+
+        vendors = [
+            {
+                "vendor_id": v.vendor_id,
+                "price": v.price,
+                "rating": v.rating,
+                "delivery_time": v.delivery_time
+            }
+            for v in vendors
+        ]
+
+        redis_client.set(cache_key, json.dumps(vendors), ex=300)
 
     if not vendors:
         return None, 0
 
-    prices = [v.price for v in vendors]
-    ratings = [v.rating for v in vendors]
-    delivery_times = [v.delivery_time for v in vendors]
+    prices = [v["price"] for v in vendors]
+    ratings = [v["rating"] for v in vendors]
+    delivery_times = [v["delivery_time"] for v in vendors]
 
     min_price, max_price = min(prices), max(prices)
     min_delivery, max_delivery = min(delivery_times), max(delivery_times)
@@ -32,19 +52,18 @@ def select_best_vendor(db, product_id, quantity):
     best_price = 0
 
     for v in vendors:
-        price_score = (max_price - v.price) / (max_price - min_price + 0.01)
-        rating_score = v.rating / 5
-        delivery_score = (max_delivery - v.delivery_time) / (max_delivery - min_delivery + 0.01)
+        price_score = (max_price - v["price"]) / (max_price - min_price + 0.01)
+        rating_score = v["rating"] / 5
+        delivery_score = (max_delivery - v["delivery_time"]) / (max_delivery - min_delivery + 0.01)
 
         score = (0.5 * price_score) + (0.3 * rating_score) + (0.2 * delivery_score)
 
         if score > best_score:
             best_score = score
-            best_vendor = v.vendor_id
-            best_price = v.price
+            best_vendor = v["vendor_id"]
+            best_price = v["price"]
 
     return best_vendor, best_price
-
 
 @router.post("/", response_model=schemas.BulkOrderResponse)
 def create_bulk_order(
