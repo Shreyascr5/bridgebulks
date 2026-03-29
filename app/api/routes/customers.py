@@ -16,3 +16,11 @@ def create_customer(customer: schemas.CustomerCreate, db: Session = Depends(get_
 @router.get("/")
 def get_customers(db: Session = Depends(get_db)):
     return db.query(models.Customer).all()
+
+@router.get("/me")
+def get_current_customer(user_id: int = Depends(get_current_user), db: Session = Depends(get_db)):
+    customer = db.query(Customer).filter(Customer.id == user_id).first()
+    return {
+        "id": customer.id,
+        "email": customer.email
+    }

@@ -4,6 +4,7 @@ import Dashboard from "./pages/Dashboard";
 import CreateOrder from "./pages/CreateOrder";
 import OrderHistory from "./pages/OrderHistory";
 import Vendors from "./pages/Vendors";
+import Profile from "./pages/Profile";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/create-order" element={<CreateOrder />} />
         <Route path="/orders" element={<OrderHistory />} />
         <Route path="/vendors" element={<Vendors />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </Router>
   );

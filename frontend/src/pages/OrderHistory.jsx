@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import Navbar from "../components/Navbar";
 
 function OrderHistory() {
   const [orders, setOrders] = useState([]);
@@ -20,26 +21,39 @@ function OrderHistory() {
     fetchOrders();
   }, []);
 
+  const getStatusColor = (status) => {
+    if (status === "Placed") return "secondary";
+    if (status === "Processing") return "warning";
+    if (status === "Shipped") return "primary";
+    if (status === "Delivered") return "success";
+    return "secondary";
+  };
+
   return (
     <div>
-      <h2>Order History</h2>
+      <Navbar />
+      <div className="container mt-4">
+        <h2>Order History</h2>
 
-      {orders.map((order) => (
-        <div key={order.order_id}>
-          <p>Order ID: {order.order_id}</p>
-          <p>Total Price: {order.total_price}</p>
+        {orders.map((order) => (
+          <div className="card p-3 mt-3" key={order.order_id}>
+            <h5>Order ID: {order.order_id}</h5>
+            <p>Total Price: ₹{order.total_price}</p>
 
-          <h4>Items:</h4>
-          {order.items.map((item, index) => (
-            <div key={index}>
-              <p>Product ID: {item.product_id}</p>
-              <p>Vendor ID: {item.vendor_id}</p>
-              <p>Quantity: {item.quantity}</p>
-            </div>
-          ))}
-          <hr />
-        </div>
-      ))}
+            <span className={`badge bg-${getStatusColor(order.status)}`}>
+              {order.status}
+            </span>
+
+            <hr />
+            <h6>Items:</h6>
+            {order.items.map((item, index) => (
+              <div key={index}>
+                Product ID: {item.product_id} | Vendor ID: {item.vendor_id} | Qty: {item.quantity}
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

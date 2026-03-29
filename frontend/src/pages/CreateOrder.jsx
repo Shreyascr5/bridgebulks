@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import Navbar from "../components/Navbar";
 
 function CreateOrder() {
   const [products, setProducts] = useState([]);
-  const [items, setItems] = useState([
-    { product_id: "", quantity: "" }
-  ]);
+  const [items, setItems] = useState([{ product_id: "", quantity: "" }]);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -30,7 +29,7 @@ function CreateOrder() {
 
     const res = await axios.post(
       "http://127.0.0.1:8000/bulk-orders/",
-      { items: items },
+      { items },
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -43,35 +42,49 @@ function CreateOrder() {
 
   return (
     <div>
-      <h2>Create Bulk Order</h2>
+      <Navbar />
 
-      {items.map((item, index) => (
-        <div key={index}>
-          <select
-            onChange={(e) =>
-              updateItem(index, "product_id", e.target.value)
-            }
-          >
-            <option>Select Product</option>
-            {products.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name}
-              </option>
-            ))}
-          </select>
+      <div className="container mt-4">
+        <h2>Create Bulk Order</h2>
 
-          <input
-            placeholder="Quantity"
-            onChange={(e) =>
-              updateItem(index, "quantity", e.target.value)
-            }
-          />
-        </div>
-      ))}
+        {items.map((item, index) => (
+          <div className="row mt-2" key={index}>
+            <div className="col">
+              <select
+                className="form-control"
+                onChange={(e) =>
+                  updateItem(index, "product_id", e.target.value)
+                }
+              >
+                <option>Select Product</option>
+                {products.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-      <button onClick={addItem}>Add Product</button>
-      <br /><br />
-      <button onClick={createOrder}>Create Order</button>
+            <div className="col">
+              <input
+                className="form-control"
+                placeholder="Quantity"
+                onChange={(e) =>
+                  updateItem(index, "quantity", e.target.value)
+                }
+              />
+            </div>
+          </div>
+        ))}
+
+        <button className="btn btn-secondary mt-3" onClick={addItem}>
+          Add Product
+        </button>
+
+        <button className="btn btn-dark mt-3 ms-2" onClick={createOrder}>
+          Create Order
+        </button>
+      </div>
     </div>
   );
 }

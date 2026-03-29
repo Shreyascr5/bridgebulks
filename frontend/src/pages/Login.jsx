@@ -7,8 +7,8 @@ function Login() {
 
   const login = async () => {
     const res = await axios.post("http://127.0.0.1:8000/login", {
-      email: email,
-      password: password,
+      email,
+      password,
     });
 
     localStorage.setItem("token", res.data.access_token);
@@ -16,21 +16,27 @@ function Login() {
   };
 
   return (
-    <div>
-      <h2>BridgeBulks Login</h2>
-      <input
-        type="text"
-        placeholder="Email"
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <br />
-      <input
-        type="password"
-        placeholder="Password"
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <br />
-      <button onClick={login}>Login</button>
+    <div className="container mt-5">
+      <div className="card p-4 mx-auto" style={{ maxWidth: "400px" }}>
+        <h3 className="text-center">BridgeBulks Login</h3>
+
+        <input
+          className="form-control mt-3"
+          placeholder="Email"
+          onChange={(e) => setEmail(e.target.value)}
+        />
+
+        <input
+          className="form-control mt-3"
+          type="password"
+          placeholder="Password"
+          onChange={(e) => setPassword(e.target.value)}
+        />
+
+        <button className="btn btn-dark mt-3" onClick={login}>
+          Login
+        </button>
+      </div>
     </div>
   );
 }

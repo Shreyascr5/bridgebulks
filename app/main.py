@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from app import models
 from app.db import engine
 
+
 from app.api.routes import (
     vendors,
     products,
@@ -33,6 +34,7 @@ app.include_router(auth.router)
 app.include_router(vendor_performance.router)
 app.include_router(vendor_rating.router)
 app.include_router(order_status.router)
+app.include_router(customers.router)  # Add this line to include the customers router
 
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 

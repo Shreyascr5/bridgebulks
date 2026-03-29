@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Bar } from "react-chartjs-2";
+import Navbar from "../components/Navbar";
+import { Bar, Pie } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   BarElement,
@@ -8,9 +9,17 @@ import {
   LinearScale,
   Tooltip,
   Legend,
+  ArcElement,
 } from "chart.js";
 
-ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
+ChartJS.register(
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend,
+  ArcElement
+);
 
 function Dashboard() {
   const [data, setData] = useState({});
@@ -25,7 +34,7 @@ function Dashboard() {
     fetchData();
   }, []);
 
-  const chartData = {
+  const barData = {
     labels: vendorData.map((v) => v.vendor_name),
     datasets: [
       {
@@ -35,28 +44,56 @@ function Dashboard() {
     ],
   };
 
+  const pieData = {
+    labels: vendorData.map((v) => v.vendor_name),
+    datasets: [
+      {
+        data: vendorData.map((v) => v.orders),
+      },
+    ],
+  };
+
   return (
     <div>
-      <h2>BridgeBulks Dashboard</h2>
+      <Navbar />
 
-      <button onClick={() => (window.location.href = "/create-order")}>
-        Create Order
-      </button>
-      <button onClick={() => (window.location.href = "/orders")}>
-        Order History
-      </button>
-      <button onClick={() => (window.location.href = "/vendors")}>
-        Vendor Performance
-      </button>
+      <div className="container mt-4">
+        <h2>Dashboard</h2>
 
-      <h3>Analytics</h3>
-      <p>Total Orders: {data.total_orders}</p>
-      <p>Total Revenue: {data.total_revenue}</p>
-      <p>Average Order Value: {data.average_order_value}</p>
+        <div className="row mt-4">
+          <div className="col-md-4">
+            <div className="card p-3">
+              <h5>Total Orders</h5>
+              <h3>{data.total_orders}</h3>
+            </div>
+          </div>
 
-      <h3>Vendor Revenue Chart</h3>
-      <div style={{ width: "500px" }}>
-        <Bar data={chartData} />
+          <div className="col-md-4">
+            <div className="card p-3">
+              <h5>Total Revenue</h5>
+              <h3>₹{data.total_revenue}</h3>
+            </div>
+          </div>
+
+          <div className="col-md-4">
+            <div className="card p-3">
+              <h5>Average Order Value</h5>
+              <h3>₹{data.average_order_value}</h3>
+            </div>
+          </div>
+        </div>
+
+        <div className="card mt-4 p-3">
+          <h4>Vendor Revenue Chart</h4>
+          <Bar data={barData} />
+        </div>
+
+        <div className="card mt-4 p-3">
+          <h4>Vendor Order Distribution</h4>
+          <div style={{ width: "400px" }}>
+            <Pie data={pieData} />
+          </div>
+        </div>
       </div>
     </div>
   );
