@@ -3,5 +3,6 @@ uvicorn
 sqlalchemy
 psycopg2-binary
 pydantic
-redis
-requests
+python-jose
+passlib[bcrypt]
+bcrypt==3.2.2

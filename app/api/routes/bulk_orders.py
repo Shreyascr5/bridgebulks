@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.db import get_db
 from app import models, schemas
-from app.models import VendorProduct, Vendor, BulkOrder, BulkOrderItem
+from app.models import VendorProduct, Vendor, BulkOrder, BulkOrderItem, VendorPerformance
+from app.auth import get_current_user
 
 router = APIRouter(prefix="/bulk-orders", tags=["Bulk Orders"])
 
@@ -46,8 +47,12 @@ def select_best_vendor(db, product_id, quantity):
 
 
 @router.post("/", response_model=schemas.BulkOrderResponse)
-def create_bulk_order(order: schemas.BulkOrderCreate, db: Session = Depends(get_db)):
-    db_order = BulkOrder(customer_id=order.customer_id, total_price=0)
+def create_bulk_order(
+    order: schemas.BulkOrderCreate,
+    db: Session = Depends(get_db),
+    user_id: int = Depends(get_current_user)
+):
+    db_order = BulkOrder(customer_id=user_id, total_price=0)
     db.add(db_order)
     db.commit()
     db.refresh(db_order)
@@ -59,11 +64,12 @@ def create_bulk_order(order: schemas.BulkOrderCreate, db: Session = Depends(get_
         vendor_id, price = select_best_vendor(db, item.product_id, item.quantity)
 
         if vendor_id is None:
-            raise HTTPException(status_code=404, detail="No vendor found for product")
+            raise HTTPException(status_code=404, detail="No vendor found")
 
         item_total = price * item.quantity
         total_price += item_total
 
+        # Save bulk order item
         db_item = BulkOrderItem(
             order_id=db_order.id,
             product_id=item.product_id,
@@ -71,6 +77,15 @@ def create_bulk_order(order: schemas.BulkOrderCreate, db: Session = Depends(get_
             quantity=item.quantity
         )
         db.add(db_item)
+
+        # Save vendor performance
+        performance = VendorPerformance(
+            vendor_id=vendor_id,
+            order_id=db_order.id,
+            rating=4.0,
+            delivery_time=3
+        )
+        db.add(performance)
 
         items_response.append({
             "product_id": item.product_id,
@@ -90,26 +105,27 @@ def create_bulk_order(order: schemas.BulkOrderCreate, db: Session = Depends(get_
     }
 
 
-@router.get("/", response_model=list[schemas.BulkOrderResponse])
-def get_bulk_orders(db: Session = Depends(get_db)):
-    orders = db.query(BulkOrder).all()
-    response = []
+@router.get("/my-orders")
+def get_my_orders(
+    db: Session = Depends(get_db),
+    user_id: int = Depends(get_current_user)
+):
+    orders = db.query(BulkOrder).filter(BulkOrder.customer_id == user_id).all()
+    result = []
 
     for order in orders:
         items = db.query(BulkOrderItem).filter(BulkOrderItem.order_id == order.id).all()
-
-        response.append({
-            "id": order.id,
-            "customer_id": order.customer_id,
+        result.append({
+            "order_id": order.id,
             "total_price": order.total_price,
             "items": [
                 {
                     "product_id": i.product_id,
-                    "quantity": i.quantity,
-                    "vendor_id": i.vendor_id
+                    "vendor_id": i.vendor_id,
+                    "quantity": i.quantity
                 }
                 for i in items
             ]
         })
 
-    return response
+    return result

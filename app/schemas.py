@@ -100,3 +100,18 @@ class BulkOrderResponse(BaseModel):
     customer_id: int
     total_price: float
     items: List[BulkOrderItemResponse]
+
+class CustomerRegister(BaseModel):
+    name: str
+    email: str
+    password: str
+
+
+class CustomerLogin(BaseModel):
+    email: str
+    password: str
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
