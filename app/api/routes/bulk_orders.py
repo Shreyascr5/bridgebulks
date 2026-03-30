@@ -148,3 +148,31 @@ def get_my_orders(
         })
 
     return result
+@router.get("/{order_id}/savings")
+def calculate_savings(order_id: int, db: Session = Depends(get_db)):
+    order = db.query(models.BulkOrder).filter(models.BulkOrder.id == order_id).first()
+
+    if not order:
+        return {"error": "Order not found"}
+
+    market_price = 0
+    bulk_price = order.total_price
+
+    for item in order.items:
+        vendor_prices = db.query(models.VendorProduct).filter(
+            models.VendorProduct.product_id == item.product_id
+        ).all()
+
+        if not vendor_prices:
+            continue
+
+        avg_price = sum(v.price for v in vendor_prices) / len(vendor_prices)
+        market_price += avg_price * item.quantity
+
+    savings = market_price - bulk_price
+
+    return {
+        "market_price": round(market_price, 2),
+        "bulk_price": round(bulk_price, 2),
+        "savings": round(savings, 2)
+    }
