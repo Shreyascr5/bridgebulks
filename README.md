@@ -1,10 +1,152 @@
-# Screenshots
+# BridgeBulks — Intelligent Bulk Procurement System
 
-## Screenshot 1
-![Screenshot 1](Blank diagram.jpeg)
+## Overview
 
-## Screenshot 2
-![Screenshot 2](Blank diagram (1).jpeg)
+BridgeBulks is a full-stack web application that optimizes bulk purchasing by automatically selecting the best vendor based on price, vendor rating, delivery time, and stock availability. The system helps customers reduce procurement costs and improve vendor selection using an intelligent scoring algorithm.
 
-## Screenshot 3
-![Screenshot 3](Blank diagram (2).jpeg)
+This project demonstrates supply chain optimization using a Multi-Criteria Decision Making (MCDM) algorithm.
+
+## Tech Stack
+
+| Layer     | Technology                          |
+|-----------|-------------------------------------|
+| Frontend  | React (Vite) + Bootstrap             |
+| Backend   | FastAPI (Python)                    |
+| Database  | PostgreSQL                          |
+| Cache     | Redis                              |
+| Authentication | JWT                                |
+| Charts    | Chart.js                            |
+| Containerization | Docker                             |
+
+## Backend
+
+The backend is built using FastAPI and provides:
+
+- JWT Authentication (Login & Register)
+- Vendor Management
+- Product Management
+- Vendor Inventory Management
+- Bulk Order Processing
+- Intelligent Vendor Selection Algorithm
+- Order Status Tracking
+- Vendor Rating System
+- Savings Calculation
+- Analytics Dashboard
+- Redis Caching
+
+Backend runs on: `http://127.0.0.1:8000`
+
+Swagger API Docs: `http://127.0.0.1:8000/docs`
+
+## Frontend
+
+The frontend is built using React (Vite) and provides:
+
+- Login & Registration
+- Dashboard with analytics charts
+- Bulk order creation
+- Order history tracking
+- Vendor inventory view
+- Vendor comparison page
+- Order status tracking
+- Vendor performance visualization
+
+Frontend runs on: `http://localhost:5173`
+
+## Vendor Selection Algorithm
+
+The system selects the best vendor using a weighted scoring formula:
+
+**Score = (1 / Price) × 0.5 + (Rating / 5) × 0.3 + (1 / Delivery Days) × 0.2**
+
+### Weight Distribution
+
+| Factor          | Weight |
+|-----------------|--------|
+| Price           | 50%    |
+| Rating          | 30%    |
+| Delivery Time   | 20%    |
+
+The vendor with the highest score is selected automatically.
+
+## Main Modules
+
+- Authentication
+- Vendors
+- Products
+- Inventory
+- Bulk Orders
+- Vendor Selection
+- Comparison & Savings
+- Order Status Tracking
+- Vendor Rating
+- Analytics Dashboard
+
+## How to Run the Project
+
+### Using Docker
+
+```bash
+docker compose up --build
+```
+
+Backend: `http://127.0.0.1:8000`
+
+Frontend: `http://localhost:5173`
+
+## Test Flow
+
+1. Register a new user
+2. Login
+3. Add Vendors
+4. Add Products
+5. Vendors add Inventory (price, stock, delivery days)
+6. Create Bulk Order
+7. System selects best vendor automatically
+8. View Comparison Page
+9. View Savings
+10. Track Order Status
+11. View Analytics Dashboard
+
+## Project Structure
+
+```
+bridgebulks/
+│
+├── app/
+│   ├── api/routes/
+│   ├── models.py
+│   ├── schemas.py
+│   ├── db.py
+│   └── main.py
+│
+├── frontend/
+│   ├── src/pages/
+│   ├── src/components/
+│   └── src/App.jsx
+│
+├── docker-compose.yml
+├── Dockerfile
+└── README.md
+```
+
+## Project Title
+
+BridgeBulks: Intelligent Vendor Selection and Bulk Procurement Optimization Using Multi-Criteria Decision Making
+
+## Author
+
+Shreyas C R
+
+M.Tech CSE Project — BridgeBulks
+
+## Screenshots
+
+### ER Diagram
+![ER Diagram](Blank%20diagram.jpeg)
+
+### Test Flow
+![Test Flow](Blank%20diagram%20%281%29.jpeg)
+
+### System Architecture
+![System Architecture](Blank%20diagram%20%282%29.jpeg)
