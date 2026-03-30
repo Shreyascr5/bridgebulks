@@ -18,6 +18,9 @@ function Navbar() {
           <a className="btn btn-outline-light me-2" href="/create-order">
             Create Order
           </a>
+          <a className="btn btn-secondary me-2" href="/inventory">
+            Inventory
+          </a>
           <a className="btn btn-outline-light me-2" href="/orders">
             Orders
           </a>
@@ -26,6 +29,12 @@ function Navbar() {
           </a>
           <a className="btn btn-outline-light me-2" href="/profile">
             Profile
+          </a>
+          <a className="btn btn-warning me-2" href="/comparison">
+            Comparison
+          </a>
+          <a className="btn btn-info me-2" href="/order-status">
+            Order Status
           </a>
           <button className="btn btn-danger" onClick={logout}>
             Logout

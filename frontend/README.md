@@ -1,32 +1,127 @@
-# React + Vite
+BridgeBulks — Intelligent Bulk Procurement System
+Overview
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+BridgeBulks is a full-stack web application that optimizes bulk purchasing by automatically selecting the best vendor based on price, vendor rating, delivery time, and stock availability. The system helps customers reduce procurement costs and improve vendor selection using an intelligent scoring algorithm.
 
-Currently, two official plugins are available:
+This project demonstrates supply chain optimization using a Multi-Criteria Decision Making (MCDM) algorithm.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Tech Stack
+Layer Technology
+Frontend React (Vite) + Bootstrap
+Backend FastAPI (Python)
+Database PostgreSQL
+Cache Redis
+Authentication JWT
+Charts Chart.js
+Containerization Docker
+Backend
 
-## React Compiler
+The backend is built using FastAPI and provides:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+JWT Authentication (Login & Register)
+Vendor Management
+Product Management
+Vendor Inventory Management
+Bulk Order Processing
+Intelligent Vendor Selection Algorithm
+Order Status Tracking
+Vendor Rating System
+Savings Calculation
+Analytics Dashboard
+Redis Caching
 
-## Expanding the ESLint configuration
+Backend runs on:
+http://127.0.0.1:8000
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Swagger API Docs:
+http://127.0.0.1:8000/docs
 
-## Frontend
+Frontend
 
 The frontend is built using React (Vite) and provides:
 
-- Login interface
-- Dashboard with analytics charts
-- Bulk order creation
-- Order history tracking
-- Vendor performance visualization
+Login & Registration
+Dashboard with analytics charts
+Bulk order creation
+Order history tracking
+Vendor inventory view
+Vendor comparison page
+Order status tracking
+Vendor performance visualization
 
 Frontend runs on:
 http://localhost:5173
 
-Backend runs on:
+Vendor Selection Algorithm
+
+The system selects the best vendor using a weighted scoring formula:
+
+Score = (1 / Price) _ 0.5 + (Rating / 5) _ 0.3 + (1 / Delivery Days) \* 0.2
+Weight Distribution
+Factor Weight
+Price 50%
+Rating 30%
+Delivery Time 20%
+
+The vendor with the highest score is selected automatically.
+
+Main Modules
+Authentication
+Vendors
+Products
+Inventory
+Bulk Orders
+Vendor Selection
+Comparison & Savings
+Order Status Tracking
+Vendor Rating
+Analytics Dashboard
+How to Run the Project
+Using Docker
+docker compose up --build
+
+Backend:
+
 http://127.0.0.1:8000
+
+Frontend:
+
+http://localhost:5173
+Test Flow
+Register a new user
+Login
+Add Vendors
+Add Products
+Vendors add Inventory (price, stock, delivery days)
+Create Bulk Order
+System selects best vendor automatically
+View Comparison Page
+View Savings
+Track Order Status
+View Analytics Dashboard
+Project Structure
+bridgebulks/
+│
+├── app/
+│ ├── api/routes/
+│ ├── models.py
+│ ├── schemas.py
+│ ├── db.py
+│ └── main.py
+│
+├── frontend/
+│ ├── src/pages/
+│ ├── src/components/
+│ └── src/App.jsx
+│
+├── docker-compose.yml
+├── Dockerfile
+└── README.md
+Project Title
+
+BridgeBulks: Intelligent Vendor Selection and Bulk Procurement Optimization Using Multi-Criteria Decision Making
+
+Author
+
+Shreyas C R
+M.Tech CSE Project — BridgeBulks

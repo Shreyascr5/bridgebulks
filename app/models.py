@@ -67,3 +67,13 @@ class VendorPerformance(Base):
     order_id = Column(Integer, ForeignKey("bulk_orders.id"))
     rating = Column(Float)
     delivery_time = Column(Integer)
+    
+class Inventory(Base):
+    __tablename__ = "inventory"
+
+    id = Column(Integer, primary_key=True, index=True)
+    vendor_id = Column(Integer, ForeignKey("vendors.id"))
+    product_id = Column(Integer, ForeignKey("products.id"))
+    price = Column(Float)
+    stock = Column(Integer)
+    delivery_days = Column(Integer)

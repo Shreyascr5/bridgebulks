@@ -16,7 +16,8 @@ from app.api.routes import (
     vendor_performance,
     vendor_rating,
     order_status,
-    comparison
+    comparison,
+    inventory
 )
 
 models.Base.metadata.create_all(bind=engine)
@@ -34,6 +35,7 @@ app.include_router(vendor_performance.router)
 app.include_router(vendor_rating.router)
 app.include_router(order_status.router)
 app.include_router(comparison.router)
+app.include_router(inventory.router)
 
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
