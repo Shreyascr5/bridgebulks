@@ -138,7 +138,7 @@ BridgeBulks: Intelligent Vendor Selection and Bulk Procurement Optimization Usin
 
 Shreyas C R
 
-M.Tech CSE Project — BridgeBulks
+M.Tech
 
 ## Screenshots
 
