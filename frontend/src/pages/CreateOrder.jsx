@@ -4,11 +4,11 @@ import Navbar from "../components/Navbar";
 
 function CreateOrder() {
   const [products, setProducts] = useState([]);
-  const [items, setItems] = useState([{ product_id: "", quantity: "" }]);
+  const [items, setItems] = useState([{ product_id: "", quantity: "1" }]);
 
   useEffect(() => {
     const fetchProducts = async () => {
-      const res = await axios.get("http://127.0.0.1:8000/products/");
+      const res = await axios.get("/products/");
       setProducts(res.data);
     };
     fetchProducts();
@@ -25,19 +25,28 @@ function CreateOrder() {
   };
 
   const createOrder = async () => {
-    const token = localStorage.getItem("token");
+    try {
+      // Backend currently supports creating one BulkOrder at a time,
+      // so we create one order per item selection.
+      for (const item of items) {
+        if (!item.product_id) continue;
+        const qty = parseInt(item.quantity, 10);
+        if (!Number.isFinite(qty) || qty <= 0) continue;
 
-    const res = await axios.post(
-      "http://127.0.0.1:8000/bulk-orders/",
-      { items },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        const product = products.find((p) => String(p.id) === String(item.product_id));
+        if (!product) continue;
+
+        await axios.post("/bulk-orders/", {
+          product_id: parseInt(item.product_id, 10),
+          quantity: qty,
+          total_price: product.price * qty,
+        });
       }
-    );
 
-    alert("Order Created! Total Price: " + res.data.total_price);
+      alert("Order(s) Created!");
+    } catch {
+      alert("Failed to create order(s).");
+    }
   };
 
   return (

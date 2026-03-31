@@ -8,12 +8,15 @@ function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:8000/auth/login", {
+      const res = await axios.post("/auth/login", {
         email,
         password,
       });
 
-      localStorage.setItem("token", res.data.access_token);
+      // Backend currently returns a message only; keep token optional.
+      if (res.data && res.data.access_token) {
+        localStorage.setItem("token", res.data.access_token);
+      }
       alert("Login successful!");
       window.location.href = "/dashboard";
     } catch (err) {

@@ -6,6 +6,7 @@ import Dashboard from "./pages/Dashboard";
 import BulkOrder from "./pages/BulkOrder";
 import Inventory from "./pages/Inventory";
 import Comparison from "./pages/Comparison";
+import Vendors from "./pages/Vendors";
 import OrderHistory from "./pages/OrderHistory";
 
 
@@ -20,6 +21,7 @@ function App() {
         <Route path="/bulk-order" element={<BulkOrder />} />
         <Route path="/inventory" element={<Inventory />} />
         <Route path="/comparison" element={<Comparison />} />
+        <Route path="/vendor-performance-ui" element={<Vendors />} />
         <Route path="/orders" element={<OrderHistory />} />
       </Routes>
     </Router>

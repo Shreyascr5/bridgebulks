@@ -36,6 +36,12 @@ const API = {
 
   getDashboard: () =>
     fetch("/analytics/dashboard").then((res) => res.json()),
+
+  getRevenueByProduct: () =>
+    fetch("/analytics/revenue-by-product").then((res) => res.json()),
+
+  getOrdersByProduct: () =>
+    fetch("/analytics/orders-by-product").then((res) => res.json()),
 };
 
 export default API;

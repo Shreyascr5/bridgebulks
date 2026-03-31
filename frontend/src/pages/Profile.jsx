@@ -8,18 +8,17 @@ function Profile() {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const token = localStorage.getItem("token");
+      // This demo UI keeps customer/auth logic minimal.
+      // Backend's order-history demo endpoint is available without auth.
+      try {
+        const ordersRes = await axios.get("/bulk-orders/my-orders");
+        setOrders(ordersRes.data || []);
+      } catch {
+        setOrders([]);
+      }
 
-      const res1 = await axios.get("http://127.0.0.1:8000/customers/me", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      const res2 = await axios.get("http://127.0.0.1:8000/bulk-orders/my-orders", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      setProfile(res1.data);
-      setOrders(res2.data);
+      // Show a friendly placeholder profile for the presentation.
+      setProfile({ email: "demo@bridgebulks.com" });
     };
 
     fetchProfile();

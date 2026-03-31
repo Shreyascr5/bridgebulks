@@ -21,6 +21,9 @@ function Navbar() {
               <Link className="nav-link" to="/comparison">Compare Vendors</Link>
             </li>
             <li className="nav-item">
+              <Link className="nav-link" to="/vendor-performance-ui">Vendor Performance</Link>
+            </li>
+            <li className="nav-item">
               <Link className="nav-link" to="/orders">Order Status</Link>
             </li>
           </ul>
