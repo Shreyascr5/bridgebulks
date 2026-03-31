@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import Navbar from "../components/Navbar";
 
 function OrderStatus() {
   const [orders, setOrders] = useState([]);
@@ -23,9 +22,7 @@ function OrderStatus() {
   };
 
   return (
-    <div>
-      <Navbar />
-      <div className="container mt-4">
+    <div className="container mt-4">
         <h2>Order Status Tracking</h2>
 
         {error && <div className="alert alert-warning mt-3">{error}</div>}
@@ -69,7 +66,6 @@ function OrderStatus() {
           </tbody>
         </table>
       </div>
-    </div>
   );
 }
 

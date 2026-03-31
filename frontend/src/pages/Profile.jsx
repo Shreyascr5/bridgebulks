@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import Navbar from "../components/Navbar";
 
 function Profile() {
   const [profile, setProfile] = useState({});
@@ -27,9 +26,7 @@ function Profile() {
   const totalSpent = orders.reduce((sum, o) => sum + o.total_price, 0);
 
   return (
-    <div>
-      <Navbar />
-      <div className="container mt-4">
+    <div className="container mt-4">
         <h2>User Profile</h2>
 
         <div className="card p-3 mt-3">
@@ -38,7 +35,6 @@ function Profile() {
           <p>Total Spent: ₹{totalSpent}</p>
         </div>
       </div>
-    </div>
   );
 }
 

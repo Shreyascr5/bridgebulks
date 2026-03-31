@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import Navbar from "../components/Navbar";
 
 function CreateOrder() {
   const [products, setProducts] = useState([]);
@@ -50,10 +49,7 @@ function CreateOrder() {
   };
 
   return (
-    <div>
-      <Navbar />
-
-      <div className="container mt-4">
+    <div className="container mt-4">
         <h2>Create Bulk Order</h2>
 
         {items.map((item, index) => (
@@ -94,7 +90,6 @@ function CreateOrder() {
           Create Order
         </button>
       </div>
-    </div>
   );
 }
 

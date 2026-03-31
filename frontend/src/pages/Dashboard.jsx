@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import API from "../api";
-import Navbar from "../components/Navbar";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -74,10 +73,7 @@ function Dashboard() {
   };
 
   return (
-    <div>
-      <Navbar />
-
-      <div className="container mt-4">
+    <div className="container mt-4">
         <h2 className="mb-4">Analytics Dashboard</h2>
 
         <div className="row">
@@ -141,7 +137,6 @@ function Dashboard() {
           </div>
         </div>
       </div>
-    </div>
   );
 }
 

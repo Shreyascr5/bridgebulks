@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import Navbar from "../components/Navbar";
 
 function OrderHistory() {
   const [orders, setOrders] = useState([]);
@@ -27,9 +26,7 @@ function OrderHistory() {
   };
 
   return (
-    <div>
-      <Navbar />
-      <div className="container mt-4">
+    <div className="container mt-4">
         <h2>Order History</h2>
 
         {orders.length === 0 ? (
@@ -50,7 +47,6 @@ function OrderHistory() {
           ))
         )}
       </div>
-    </div>
   );
 }
 

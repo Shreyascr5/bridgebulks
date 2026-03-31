@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
-import Navbar from "../components/Navbar";
 
 function BulkOrder() {
   const [products, setProducts] = useState([]);
@@ -47,9 +46,7 @@ function BulkOrder() {
   };
 
   return (
-    <div>
-      <Navbar />
-      <div className="container mt-4">
+    <div className="container mt-4">
         <h2>Create Bulk Order</h2>
 
         <form onSubmit={handleSubmit} className="mt-3">
@@ -90,7 +87,6 @@ function BulkOrder() {
           </div>
         </form>
       </div>
-    </div>
   );
 }
 

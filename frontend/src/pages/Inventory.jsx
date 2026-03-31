@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import Navbar from "../components/Navbar";
 
 function Inventory() {
   const [vendors, setVendors] = useState([]);
@@ -54,9 +53,7 @@ function Inventory() {
   };
 
   return (
-    <div>
-      <Navbar />
-      <div className="container mt-4">
+    <div className="container mt-4">
         <h2>Inventory Management</h2>
 
         <form onSubmit={handleSubmit} className="mb-4">
@@ -120,7 +117,6 @@ function Inventory() {
           </tbody>
         </table>
       </div>
-    </div>
   );
 }
 

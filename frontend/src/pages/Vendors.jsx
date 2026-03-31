@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import Navbar from "../components/Navbar";
 
 function Vendors() {
   const [vendors, setVendors] = useState([]);
@@ -27,9 +26,7 @@ function Vendors() {
   };
 
   return (
-    <div>
-      <Navbar />
-      <div className="container mt-4">
+    <div className="container mt-4">
         <h2>Vendor Performance</h2>
 
         {vendors.length === 0 ? (
@@ -47,7 +44,6 @@ function Vendors() {
           ))
         )}
       </div>
-    </div>
   );
 }
 
