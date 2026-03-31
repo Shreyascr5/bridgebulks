@@ -8,11 +8,11 @@ function Register() {
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    await axios.post("http://127.0.0.1:8000/register", {
-      name,
-      email,
-      password,
-    });
+    await axios.post("http://localhost:8000/auth/register", {
+  name,
+  email,
+  password
+});
 
     alert("Registered! Please login.");
     window.location.href = "/login";

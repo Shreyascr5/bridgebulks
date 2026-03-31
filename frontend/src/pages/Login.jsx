@@ -8,9 +8,9 @@ function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://127.0.0.1:8000/login", {
-        username: email,
-        password: password,
+      const res = await axios.post("http://localhost:8000/auth/login", {
+        email,
+        password,
       });
 
       localStorage.setItem("token", res.data.access_token);

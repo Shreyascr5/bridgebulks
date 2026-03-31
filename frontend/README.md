@@ -1,19 +1,87 @@
-BridgeBulks — Intelligent Bulk Procurement System
-Overview
+# BridgeBulks
+
+## Intelligent Vendor Selection & Bulk Procurement Optimization System
+
+---
+
+## Overview
 
 BridgeBulks is a full-stack web application that optimizes bulk purchasing by automatically selecting the best vendor based on price, vendor rating, delivery time, and stock availability. The system helps customers reduce procurement costs and improve vendor selection using an intelligent scoring algorithm.
 
 This project demonstrates supply chain optimization using a Multi-Criteria Decision Making (MCDM) algorithm.
 
-Tech Stack
-Layer Technology
-Frontend React (Vite) + Bootstrap
-Backend FastAPI (Python)
-Database PostgreSQL
-Cache Redis
-Authentication JWT
-Charts Chart.js
-Containerization Docker
+---
+
+## Tech Stack
+
+| Layer            | Technology               |
+| ---------------- | ------------------------ |
+| Frontend         | React (Vite) + Bootstrap |
+| Backend          | FastAPI (Python)         |
+| Database         | PostgreSQL               |
+| Cache            | Redis                    |
+| Authentication   | JWT                      |
+| Charts           | Chart.js                 |
+| Containerization | Docker                   |
+
+---
+
+## System Architecture Diagram
+
+            +------------------+
+            |   React Frontend |
+            |  (Vite + Bootstrap)
+            +---------+--------+
+                      |
+                      |
+                      v
+            +------------------+
+            |    FastAPI       |
+            |     Backend      |
+            +----+----+--------+
+                 |    |
+                 |    |
+      +----------+    +-----------+
+      |                           |
+      v                           v
+
++------------------+ +------------------+
+| PostgreSQL | | Redis |
+| Database | | Cache |
++------------------+ +------------------+
+|
+v
++----------------------+
+| Vendor Selection |
+| Algorithm (MCDM) |
++----------------------+
+|
+v
++----------------------+
+| Vendor Selection |
+| Algorithm (MCDM) |
++----------------------+
+
+---
+
+## Vendor Selection Algorithm
+
+The system selects the best vendor using a weighted scoring formula:
+Score = (1 / Price) \* 0.5
+
+- (Rating / 5) \* 0.3
+- (1 / Delivery Days) \* 0.2
+
+### Weight Distribution
+
+| Factor        | Weight |
+| ------------- | ------ |
+| Price         | 50%    |
+| Rating        | 30%    |
+| Delivery Time | 20%    |
+
+The vendor with the highest score is selected automatically.
+
 Backend
 
 The backend is built using FastAPI and provides:
@@ -30,7 +98,7 @@ Savings Calculation
 Analytics Dashboard
 Redis Caching
 
-Backend runs on:
+Backend URL:
 http://127.0.0.1:8000
 
 Swagger API Docs:
@@ -49,44 +117,9 @@ Vendor comparison page
 Order status tracking
 Vendor performance visualization
 
-Frontend runs on:
+Frontend URL:
 http://localhost:5173
 
-Vendor Selection Algorithm
-
-The system selects the best vendor using a weighted scoring formula:
-
-Score = (1 / Price) _ 0.5 + (Rating / 5) _ 0.3 + (1 / Delivery Days) \* 0.2
-Weight Distribution
-Factor Weight
-Price 50%
-Rating 30%
-Delivery Time 20%
-
-The vendor with the highest score is selected automatically.
-
-Main Modules
-Authentication
-Vendors
-Products
-Inventory
-Bulk Orders
-Vendor Selection
-Comparison & Savings
-Order Status Tracking
-Vendor Rating
-Analytics Dashboard
-How to Run the Project
-Using Docker
-docker compose up --build
-
-Backend:
-
-http://127.0.0.1:8000
-
-Frontend:
-
-http://localhost:5173
 Test Flow
 Register a new user
 Login
@@ -99,7 +132,7 @@ View Comparison Page
 View Savings
 Track Order Status
 View Analytics Dashboard
-Project Structure
+
 bridgebulks/
 │
 ├── app/
@@ -117,11 +150,3 @@ bridgebulks/
 ├── docker-compose.yml
 ├── Dockerfile
 └── README.md
-Project Title
-
-BridgeBulks: Intelligent Vendor Selection and Bulk Procurement Optimization Using Multi-Criteria Decision Making
-
-Author
-
-Shreyas C R
-M.Tech CSE Project — BridgeBulks

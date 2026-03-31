@@ -3,13 +3,11 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
-import CreateOrder from "./pages/CreateOrder";
-import OrderHistory from "./pages/OrderHistory";
-import Vendors from "./pages/Vendors";
-import Comparison from "./pages/Comparison";
-import OrderStatus from "./pages/OrderStatus";
+import BulkOrder from "./pages/BulkOrder";
 import Inventory from "./pages/Inventory";
-import Profile from "./pages/Profile";
+import Comparison from "./pages/Comparison";
+import OrderHistory from "./pages/OrderHistory";
+
 
 function App() {
   return (
@@ -19,13 +17,10 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/create-order" element={<CreateOrder />} />
-        <Route path="/orders" element={<OrderHistory />} />
-        <Route path="/vendors" element={<Vendors />} />
+        <Route path="/bulk-order" element={<BulkOrder />} />
+        <Route path="/inventory" element={<Inventory />} />
         <Route path="/comparison" element={<Comparison />} />
-        <Route path="/order-status" element={<OrderStatus />} />
-        <Route path="/inventory" element={<Inventory/>}/>
-        <Route path="profile" element={<Profile/>}/>
+        <Route path="/orders" element={<OrderHistory />} />
       </Routes>
     </Router>
   );

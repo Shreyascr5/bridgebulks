@@ -1,33 +1,41 @@
 services:
   postgres:
     image: postgres:15
-    container_name: bulk_postgres
+    container_name: bridgebulks-postgres
+    restart: always
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: bulkdb
+      POSTGRES_DB: bridgebulks
     ports:
       - "5432:5432"
     volumes:
-      - pg_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    container_name: bridgebulks-backend
+    restart: always
+    depends_on:
+      - postgres
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build: ./frontend
+    container_name: bridgebulks-frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
 
   redis:
     image: redis:7
-    container_name: bulk_redis
+    container_name: bridgebulks-redis
+    restart: always
     ports:
       - "6379:6379"
 
-  api:
-    build: .
-    container_name: bulk_api
-    depends_on:
-      - postgres
-      - redis
-    ports:
-      - "8000:8000"
-    command: sh -c "sleep 10 && uvicorn app.main:app --host 0.0.0.0 --port 8000"
-    volumes:
-      - ./app:/code/app
-
 volumes:
-  pg_data:
+  postgres_data:

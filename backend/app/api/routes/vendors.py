@@ -1,10 +1,18 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from app.db import get_db
+from app.db import SessionLocal
 from app import models, schemas
 
 router = APIRouter(prefix="/vendors", tags=["Vendors"])
 
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+# Create Vendor
 @router.post("/")
 def create_vendor(vendor: schemas.VendorCreate, db: Session = Depends(get_db)):
     new_vendor = models.Vendor(name=vendor.name)
@@ -13,6 +21,7 @@ def create_vendor(vendor: schemas.VendorCreate, db: Session = Depends(get_db)):
     db.refresh(new_vendor)
     return new_vendor
 
+# Get All Vendors
 @router.get("/")
 def get_vendors(db: Session = Depends(get_db)):
     return db.query(models.Vendor).all()
