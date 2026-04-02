@@ -1,0 +1,40 @@
+# Render.yaml for Automated Deployment
+
+# PostgreSQL Service
+postgresql:
+  type: postgres
+  plan: "Standard"
+  env: "db.t2.micro"
+  version: "13"
+  database: "yourDatabaseName"
+  user: "yourUser"
+  password: "yourPassword"
+
+# Redis Service
+redis:
+  type: redis
+  plan: "Standard"
+  env: "db.t2.micro"
+  version: "6"
+
+# FastAPI Backend Service
+backend:
+  type: web
+  env: "python"  
+  plan: "Standard"  
+  rootDirectory: "backend"  
+  buildCommand: "pip install -r requirements.txt"  
+  startCommand: "uvicorn app:app --host 0.0.0.0 --port $PORT"  
+  envVars:
+    POSTGRES_URL: "postgresql://yourUser:yourPassword@postgresql:5432/yourDatabaseName"
+
+# React Frontend Service
+frontend:
+  type: web
+  env: "node"  
+  plan: "Standard"  
+  rootDirectory: "frontend"  
+  buildCommand: "npm install"  
+  startCommand: "npm start"  
+  envVars:
+    REACT_APP_API_URL: "http://backend:port/endpoint"
