@@ -13,4 +13,4 @@ COPY wait-for-postgres.sh .
 
 RUN chmod +x wait-for-postgres.sh
 
-CMD ["./wait-for-postgres.sh", "postgres", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port $PORT"]

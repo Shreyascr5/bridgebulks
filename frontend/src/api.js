@@ -1,47 +1,28 @@
-const API = {
-  register: (data) =>
-    fetch("/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    }),
+// frontend/src/api.js
 
-  login: (data) =>
-    fetch("/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    }),
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || "https://bridgebulks.onrender.com";
 
-  createVendor: (data) =>
-    fetch("/vendors/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    }),
+export async function apiRequest(endpoint, method = "GET", data = null) {
+  const url = `${API_BASE_URL}${endpoint}`;
 
-  createProduct: (data) =>
-    fetch("/products/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    }),
+  const options = {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
 
-  createOrder: (data) =>
-    fetch("/bulk-orders/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    }),
+  if (data) {
+    options.body = JSON.stringify(data);
+  }
 
-  getDashboard: () =>
-    fetch("/analytics/dashboard").then((res) => res.json()),
+  const response = await fetch(url, options);
 
-  getRevenueByProduct: () =>
-    fetch("/analytics/revenue-by-product").then((res) => res.json()),
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(errorText || "API request failed");
+  }
 
-  getOrdersByProduct: () =>
-    fetch("/analytics/orders-by-product").then((res) => res.json()),
-};
-
-export default API;
+  return response.json();
+}
