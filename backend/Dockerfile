@@ -1,16 +1,15 @@
-FROM python:3.11
+FROM python:3.11-slim
 
-WORKDIR /code
+WORKDIR /app
 
-# Install netcat (nc)
-RUN apt-get update && apt-get install -y netcat-openbsd
+# Copy requirements from backend folder
+COPY backend/requirements.txt /app/requirements.txt
 
-COPY requirements.txt .
+# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY app ./app
-COPY wait-for-postgres.sh .
+# Copy backend code
+COPY backend/app /app/app
 
-RUN chmod +x wait-for-postgres.sh
-
+# Start FastAPI
 CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port $PORT"]
