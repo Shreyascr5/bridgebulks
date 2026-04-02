@@ -1,40 +1,43 @@
-# Render.yaml for Automated Deployment
+# Render Deployment Configuration
 
-# PostgreSQL Service
-postgresql:
-  type: postgres
-  plan: "Standard"
-  env: "db.t2.micro"
-  version: "13"
-  database: "yourDatabaseName"
-  user: "yourUser"
-  password: "yourPassword"
+## Services
 
-# Redis Service
-redis:
-  type: redis
-  plan: "Standard"
-  env: "db.t2.micro"
-  version: "6"
+- **service1**:
+    name: Service 1
+    type: web
+    env: node
+    autoDeploy: true
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+        - key: NODE_ENV
+          value: production
+        - key: API_KEY
+          value: your_api_key_here
 
-# FastAPI Backend Service
-backend:
-  type: web
-  env: "python"  
-  plan: "Standard"  
-  rootDirectory: "backend"  
-  buildCommand: "pip install -r requirements.txt"  
-  startCommand: "uvicorn app:app --host 0.0.0.0 --port $PORT"  
-  envVars:
-    POSTGRES_URL: "postgresql://yourUser:yourPassword@postgresql:5432/yourDatabaseName"
+- **service2**:
+    name: Service 2
+    type: worker
+    env: python
+    autoDeploy: true
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app.py
+    envVars:
+        - key: DATABASE_URL
+          value: your_database_url_here
 
-# React Frontend Service
-frontend:
-  type: web
-  env: "node"  
-  plan: "Standard"  
-  rootDirectory: "frontend"  
-  buildCommand: "npm install"  
-  startCommand: "npm start"  
-  envVars:
-    REACT_APP_API_URL: "http://backend:port/endpoint"
+## Environment Variables
+
+- NODE_ENV: production
+- API_KEY: your_api_key_here
+- DATABASE_URL: your_database_url_here
+
+## Build and Start Commands
+
+- For Service 1:
+    - Build Command: npm install
+    - Start Command: npm start
+
+- For Service 2:
+    - Build Command: pip install -r requirements.txt
+    - Start Command: python app.py
