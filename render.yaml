@@ -2,5 +2,6 @@ services:
   - type: web
     name: bridgebulks
     env: docker
+    dockerfilePath: backend/Dockerfile
     plan: free
     autoDeploy: true
