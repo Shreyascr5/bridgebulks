@@ -1,3 +1,5 @@
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -14,6 +16,7 @@ from app.api.routes import (
     comparison,
     vendor_performance,
 )
+print("DATABASE_URL FROM ENV:", os.getenv("DATABASE_URL"))
 
 Base.metadata.create_all(bind=engine)
 
