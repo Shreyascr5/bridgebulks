@@ -1,9 +1,6 @@
-// frontend/src/api.js
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "https://bridgebulks.onrender.com";
-
-export async function apiRequest(endpoint, method = "GET", data = null) {
+async function apiRequest(endpoint, method = "GET", data = null) {
   const url = `${API_BASE_URL}${endpoint}`;
 
   const options = {
@@ -20,9 +17,17 @@ export async function apiRequest(endpoint, method = "GET", data = null) {
   const response = await fetch(url, options);
 
   if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(errorText || "API request failed");
+    throw new Error("API request failed");
   }
 
   return response.json();
 }
+
+const API = {
+  get: (endpoint) => apiRequest(endpoint, "GET"),
+  post: (endpoint, data) => apiRequest(endpoint, "POST", data),
+  put: (endpoint, data) => apiRequest(endpoint, "PUT", data),
+  delete: (endpoint) => apiRequest(endpoint, "DELETE"),
+};
+
+export default API;
