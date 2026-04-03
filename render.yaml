@@ -3,8 +3,7 @@ services:
   - type: web
     name: bridgebulks-1
     env: docker
-    rootDir: backend
-    dockerfilePath: ./Dockerfile
+    dockerfilePath: backend/Dockerfile   # path from repo root
     plan: free
     autoDeploy: true
     healthCheckPath: /
