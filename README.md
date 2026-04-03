@@ -1,5 +1,7 @@
 # BridgeBulks — Intelligent Bulk Procurement System
-
+## check out the live website here : https://bridgebulks-frontend.onrender.com/#/login
+## demo login: demo@bridgebulks.com 
+## password : demo
 ## Overview
 
 BridgeBulks is a full-stack web application that optimizes bulk purchasing by automatically selecting the best vendor based on price, vendor rating, delivery time, and stock availability. The system helps customers reduce procurement costs and improve vendor selection using an intelligent scoring algorithm.
