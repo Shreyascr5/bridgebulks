@@ -1,8 +1,2 @@
-import redis
-
-redis_client = redis.Redis(
-    host="redis",
-    port=6379,
-    db=0,
-    decode_responses=True
-)
+# Thin wrapper - re-exports redis_client from cache.py for backward compatibility.
+from app.cache import redis_client  # noqa: F401

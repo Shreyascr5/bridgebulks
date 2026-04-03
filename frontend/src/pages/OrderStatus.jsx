@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
 function OrderStatus() {
   const [orders, setOrders] = useState([]);
   const [error, setError] = useState(null);
@@ -11,9 +13,7 @@ function OrderStatus() {
 
   const fetchOrders = async () => {
     try {
-      // Order status update isn't fully implemented in the current backend model.
-      // For demo purposes, we reuse the "my-orders" endpoint.
-      const res = await axios.get("/bulk-orders/my-orders");
+      const res = await axios.get(`${API_BASE_URL}/bulk-orders/my-orders`);
       setOrders(res.data || []);
     } catch (e) {
       setError("Could not load orders.");

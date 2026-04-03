@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
 function Comparison() {
   const [products, setProducts] = useState([]);
   const [productId, setProductId] = useState("");
@@ -18,7 +20,7 @@ function Comparison() {
 
   useEffect(() => {
     axios
-      .get("/products/")
+      .get(`${API_BASE_URL}/products/`)
       .then((res) => {
         setProducts(res.data || []);
         if (res.data && res.data.length > 0) {
@@ -38,7 +40,7 @@ function Comparison() {
     if (!Number.isFinite(productIdInt) || productIdInt <= 0) return;
 
     axios
-      .get(`/comparison/${productIdInt}`)
+      .get(`${API_BASE_URL}/comparison/${productIdInt}`)
       .then((res) => {
         setVendors(res.data.vendors || []);
         setSelectedVendor(res.data.selected_vendor || null);
@@ -136,7 +138,7 @@ function Comparison() {
     };
 
     try {
-      await axios.post("/bulk-orders/", payload);
+      await axios.post(`${API_BASE_URL}/bulk-orders/`, payload);
       alert("Consortium bulk order created!");
     } catch {
       alert("Failed to create consortium bulk order.");

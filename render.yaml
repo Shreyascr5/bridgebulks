@@ -1,7 +1,40 @@
 services:
+  # ── Backend: FastAPI via Docker ─────────────────────────────────────────
   - type: web
-    name: bridgebulks
+    name: bridgebulks-1
     env: docker
-    dockerfilePath: backend/Dockerfile
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
     plan: free
     autoDeploy: true
+    healthCheckPath: /
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: bridgebulks-db
+          property: connectionString
+      - key: FRONTEND_URL
+        value: https://bridgebulks-frontend.onrender.com
+      - key: SECRET_KEY
+        generateValue: true
+
+  # ── Frontend: React/Vite static site ────────────────────────────────────
+  - type: web
+    name: bridgebulks-frontend
+    env: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    autoDeploy: true
+    envVars:
+      - key: VITE_API_URL
+        value: https://bridgebulks-1.onrender.com
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+# ── PostgreSQL ───────────────────────────────────────────────────────────
+databases:
+  - name: bridgebulks-db
+    plan: free

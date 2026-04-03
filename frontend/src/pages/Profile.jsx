@@ -1,25 +1,22 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
 function Profile() {
   const [profile, setProfile] = useState({});
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
     const fetchProfile = async () => {
-      // This demo UI keeps customer/auth logic minimal.
-      // Backend's order-history demo endpoint is available without auth.
       try {
-        const ordersRes = await axios.get("/bulk-orders/my-orders");
+        const ordersRes = await axios.get(`${API_BASE_URL}/bulk-orders/my-orders`);
         setOrders(ordersRes.data || []);
       } catch {
         setOrders([]);
       }
-
-      // Show a friendly placeholder profile for the presentation.
       setProfile({ email: "demo@bridgebulks.com" });
     };
-
     fetchProfile();
   }, []);
 

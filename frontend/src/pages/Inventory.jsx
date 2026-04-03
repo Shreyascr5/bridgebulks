@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
 function Inventory() {
   const [vendors, setVendors] = useState([]);
   const [products, setProducts] = useState([]);
@@ -16,9 +18,9 @@ function Inventory() {
   }, []);
 
   const loadData = () => {
-    fetch("/vendors/").then(res => res.json()).then(setVendors);
-    fetch("/products/").then(res => res.json()).then(setProducts);
-    fetch("/vendor-products/").then(res => res.json()).then(setInventory);
+    fetch(`${API_BASE_URL}/vendors/`).then(res => res.json()).then(setVendors).catch(() => setVendors([]));
+    fetch(`${API_BASE_URL}/products/`).then(res => res.json()).then(setProducts).catch(() => setProducts([]));
+    fetch(`${API_BASE_URL}/vendor-products/`).then(res => res.json()).then(setInventory).catch(() => setInventory([]));
   };
 
   const getVendorName = (id) => {
@@ -33,7 +35,6 @@ function Inventory() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const data = {
       vendor_id: parseInt(vendorId),
       product_id: parseInt(productId),
@@ -41,82 +42,75 @@ function Inventory() {
       stock: parseInt(stock),
       delivery_days: parseInt(deliveryDays),
     };
-
-    await fetch("/vendor-products/", {
+    await fetch(`${API_BASE_URL}/vendor-products/`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
-
     alert("Inventory Added");
     loadData();
   };
 
   return (
     <div className="container mt-4">
-        <h2>Inventory Management</h2>
+      <h2>Inventory Management</h2>
 
-        <form onSubmit={handleSubmit} className="mb-4">
-          <div className="row">
-            <div className="col">
-              <select className="form-control" onChange={(e) => setVendorId(e.target.value)}>
-                <option>Select Vendor</option>
-                {vendors.map(v => (
-                  <option key={v.id} value={v.id}>{v.name}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="col">
-              <select className="form-control" onChange={(e) => setProductId(e.target.value)}>
-                <option>Select Product</option>
-                {products.map(p => (
-                  <option key={p.id} value={p.id}>{p.name}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="col">
-              <input className="form-control" placeholder="Price" onChange={(e) => setPrice(e.target.value)} />
-            </div>
-
-            <div className="col">
-              <input className="form-control" placeholder="Stock" onChange={(e) => setStock(e.target.value)} />
-            </div>
-
-            <div className="col">
-              <input className="form-control" placeholder="Delivery Days" onChange={(e) => setDeliveryDays(e.target.value)} />
-            </div>
-
-            <div className="col">
-              <button className="btn btn-primary">Add</button>
-            </div>
+      <form onSubmit={handleSubmit} className="mb-4">
+        <div className="row g-2">
+          <div className="col">
+            <select className="form-control" onChange={(e) => setVendorId(e.target.value)}>
+              <option value="">Select Vendor</option>
+              {vendors.map(v => (
+                <option key={v.id} value={v.id}>{v.name}</option>
+              ))}
+            </select>
           </div>
-        </form>
+          <div className="col">
+            <select className="form-control" onChange={(e) => setProductId(e.target.value)}>
+              <option value="">Select Product</option>
+              {products.map(p => (
+                <option key={p.id} value={p.id}>{p.name}</option>
+              ))}
+            </select>
+          </div>
+          <div className="col">
+            <input className="form-control" placeholder="Price" onChange={(e) => setPrice(e.target.value)} />
+          </div>
+          <div className="col">
+            <input className="form-control" placeholder="Stock" onChange={(e) => setStock(e.target.value)} />
+          </div>
+          <div className="col">
+            <input className="form-control" placeholder="Delivery Days" onChange={(e) => setDeliveryDays(e.target.value)} />
+          </div>
+          <div className="col">
+            <button type="submit" className="btn btn-primary">Add</button>
+          </div>
+        </div>
+      </form>
 
-        <table className="table table-striped">
-          <thead>
-            <tr>
-              <th>Vendor</th>
-              <th>Product</th>
-              <th>Price</th>
-              <th>Stock</th>
-              <th>Delivery Days</th>
+      <table className="table table-striped">
+        <thead>
+          <tr>
+            <th>Vendor</th>
+            <th>Product</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th>Delivery Days</th>
+          </tr>
+        </thead>
+        <tbody>
+          {inventory.map(item => (
+            <tr key={item.id}>
+              <td>{getVendorName(item.vendor_id)}</td>
+              <td>{getProductName(item.product_id)}</td>
+              <td>{item.price}</td>
+              <td>{item.stock}</td>
+              <td>{item.delivery_days}</td>
             </tr>
-          </thead>
-          <tbody>
-            {inventory.map(item => (
-              <tr key={item.id}>
-                <td>{getVendorName(item.vendor_id)}</td>
-                <td>{getProductName(item.product_id)}</td>
-                <td>{item.price}</td>
-                <td>{item.stock}</td>
-                <td>{item.delivery_days}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 

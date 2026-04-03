@@ -1,6 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -8,19 +10,18 @@ function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("/auth/login", {
+      const res = await axios.post(`${API_BASE_URL}/auth/login`, {
         email,
         password,
       });
 
-      // Backend currently returns a message only; keep token optional.
       if (res.data && res.data.access_token) {
         localStorage.setItem("token", res.data.access_token);
       }
       alert("Login successful!");
-      window.location.href = "/dashboard";
+      window.location.hash = "#/dashboard";
     } catch (err) {
-      alert("Login failed");
+      alert("Login failed. Please check your credentials.");
     }
   };
 
@@ -54,11 +55,13 @@ function Login() {
                 />
               </div>
 
-              <button className="btn btn-primary w-100">Login</button>
+              <button type="submit" className="btn btn-primary w-100">
+                Login
+              </button>
             </form>
 
             <p className="mt-3 text-center">
-              New user? <a href="/register">Register</a>
+              New user? <a href="#/register">Register</a>
             </p>
           </div>
         </div>

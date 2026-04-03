@@ -1,19 +1,20 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
 function OrderHistory() {
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await axios.get("/bulk-orders/my-orders");
+        const res = await axios.get(`${API_BASE_URL}/bulk-orders/my-orders`);
         setOrders(res.data || []);
       } catch (e) {
         setOrders([]);
       }
     };
-
     fetchOrders();
   }, []);
 

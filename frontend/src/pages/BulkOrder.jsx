@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
 function BulkOrder() {
   const [products, setProducts] = useState([]);
   const [productId, setProductId] = useState("");
@@ -8,7 +10,7 @@ function BulkOrder() {
 
   useEffect(() => {
     axios
-      .get("/products/")
+      .get(`${API_BASE_URL}/products/`)
       .then((res) => {
         setProducts(res.data || []);
         if (res.data && res.data.length > 0) {
@@ -34,7 +36,7 @@ function BulkOrder() {
 
     const totalPrice = selectedProduct.price * qty;
     try {
-      await axios.post("/bulk-orders/", {
+      await axios.post(`${API_BASE_URL}/bulk-orders/`, {
         product_id: parseInt(productId, 10),
         quantity: qty,
         total_price: totalPrice,

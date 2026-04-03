@@ -1,10 +1,8 @@
 import os
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.db import engine, Base
-from app.db import SessionLocal
+from app.db import engine, Base, SessionLocal
 from app import models
 from app.api.routes import (
     auth,
@@ -16,96 +14,100 @@ from app.api.routes import (
     comparison,
     vendor_performance,
 )
-print("DATABASE_URL FROM ENV:", os.getenv("DATABASE_URL"))
 
+# ---------------------------------------------------------------------------
+# Create all DB tables on startup
+# ---------------------------------------------------------------------------
 Base.metadata.create_all(bind=engine)
 
+
+# ---------------------------------------------------------------------------
+# Seed minimal demo data (only when tables are empty)
+# ---------------------------------------------------------------------------
 def seed_dummy_data() -> None:
-    """
-    Seed minimal, consistent demo data for the presentation.
-    We only seed when the tables are empty to avoid duplicating rows.
-    """
     db = SessionLocal()
     try:
-        # Seed user
         if db.query(models.User).count() == 0:
             db.add(models.User(email="demo@bridgebulks.com", password="demo"))
 
-        # Seed vendors
         vendor_names = ["Vendor A", "Vendor B", "Vendor C"]
         existing_vendors = {v.name: v for v in db.query(models.Vendor).all()}
         for name in vendor_names:
             if name not in existing_vendors:
                 db.add(models.Vendor(name=name))
-
         db.commit()
 
-        vendors = {v.name: v for v in db.query(models.Vendor).all()}
+        vendors_map = {v.name: v for v in db.query(models.Vendor).all()}
 
-        # Seed products
-        product_specs = [
-            ("Product 1", 20.0),
-            ("Product 2", 35.0),
-            ("Product 3", 50.0),
-        ]
+        product_specs = [("Product 1", 20.0), ("Product 2", 35.0), ("Product 3", 50.0)]
         existing_products = {p.name: p for p in db.query(models.Product).all()}
         for name, price in product_specs:
             if name not in existing_products:
                 db.add(models.Product(name=name, price=price))
-
         db.commit()
 
-        products = {p.name: p for p in db.query(models.Product).all()}
+        products_map = {p.name: p for p in db.query(models.Product).all()}
 
-        # Seed vendor-products (join table) only if empty
         if db.query(models.VendorProduct).count() == 0:
-            # vendor A/B/C each supply all products with different delivery days
-            vendor_list = list(vendors.values())
-            product_list = list(products.values())
-            for v_idx, v in enumerate(vendor_list):
-                for p_idx, p in enumerate(product_list):
-                    # price slightly varied by vendor/product index
+            for v_idx, v in enumerate(vendors_map.values()):
+                for p_idx, p in enumerate(products_map.values()):
                     offer_price = float(p.price) * (0.85 + 0.05 * v_idx + 0.01 * p_idx)
-                    db.add(
-                        models.VendorProduct(
-                            vendor_id=v.id,
-                            product_id=p.id,
-                            price=offer_price,
-                            stock=100 - 10 * p_idx,
-                            delivery_days=2 + v_idx + p_idx,
-                        )
-                    )
+                    db.add(models.VendorProduct(
+                        vendor_id=v.id,
+                        product_id=p.id,
+                        price=round(offer_price, 2),
+                        stock=100 - 10 * p_idx,
+                        delivery_days=2 + v_idx + p_idx,
+                    ))
 
-        # Seed bulk orders (only if empty)
         if db.query(models.BulkOrder).count() == 0:
-            # Create a few orders for analytics charts
             product_list = list(db.query(models.Product).all())
-            if product_list:
-                for i, p in enumerate(product_list[:3]):
-                    qty = 2 + i
-                    total_price = float(p.price) * qty * 0.9
-                    db.add(
-                        models.BulkOrder(
-                            product_id=p.id,
-                            quantity=qty,
-                            total_price=total_price,
-                        )
-                    )
+            for i, p in enumerate(product_list[:3]):
+                qty = 2 + i
+                db.add(models.BulkOrder(
+                    product_id=p.id,
+                    quantity=qty,
+                    total_price=round(float(p.price) * qty * 0.9, 2),
+                ))
 
         db.commit()
+    except Exception as e:
+        db.rollback()
+        print(f"[seed] Error during seeding: {e}")
     finally:
         db.close()
 
-app = FastAPI()
+
+# ---------------------------------------------------------------------------
+# App + CORS
+# ---------------------------------------------------------------------------
+app = FastAPI(title="BridgeBulks API", version="1.0.0")
+
+# Read the deployed frontend URL from environment.
+# Set FRONTEND_URL in your Render backend service environment variables.
+FRONTEND_URL = os.getenv("FRONTEND_URL", "").strip()
+
+origins = [
+    "https://bridgebulks-frontend.onrender.com",  # production frontend
+    "http://localhost:5173",                        # local Vite dev server
+    "http://localhost:3000",
+]
+
+# Also allow whatever is set in the env variable (handles custom domains)
+if FRONTEND_URL and FRONTEND_URL not in origins:
+    origins.append(FRONTEND_URL)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# ---------------------------------------------------------------------------
+# Routers
+# ---------------------------------------------------------------------------
 app.include_router(auth.router)
 app.include_router(vendors.router)
 app.include_router(products.router)
@@ -115,10 +117,11 @@ app.include_router(analytics.router)
 app.include_router(comparison.router)
 app.include_router(vendor_performance.router)
 
-# Seed after routers are registered and tables exist.
-# (Safe for demo; guarded by table emptiness checks.)
-seed_dummy_data()
 
 @app.get("/")
 def root():
     return {"message": "BridgeBulks API Running"}
+
+
+# Seed after app + tables are fully ready
+seed_dummy_data()
